@@ -13,6 +13,7 @@ class GameLoop {
         this.delayEngine = delayEngine;
         this.lastTime = 0;
         this.isRunning = false;
+        this.customCallback = null;
 
         console.log("GameLoop initialized.");
     }
@@ -32,21 +33,29 @@ class GameLoop {
         console.log("GameLoop stopped.");
     }
 
+    setGameLoopCallback(callback) {
+        this.customCallback = typeof callback === 'function' ? callback : null;
+    }
+
     // 실제 게임 루프 함수
     loop(currentTime) {
         if (!this.isRunning) return;
 
-        const deltaTime = currentTime - this.lastTime; // 이전 프레임과의 시간 차이
+        const deltaTime = currentTime - this.lastTime;
         this.lastTime = currentTime;
 
-        // 1. 게임 로직 업데이트
-        this.gameEngine.update(deltaTime);
-        if (this.panelEngine) this.panelEngine.update(deltaTime);
-        if (this.uiEngine) this.uiEngine.update(deltaTime);
-        if (this.delayEngine) this.delayEngine.update(deltaTime);
+        if (this.customCallback) {
+            this.customCallback(currentTime);
+        } else {
+            // 1. 게임 로직 업데이트
+            this.gameEngine.update(deltaTime);
+            if (this.panelEngine) this.panelEngine.update(deltaTime);
+            if (this.uiEngine) this.uiEngine.update(deltaTime);
+            if (this.delayEngine) this.delayEngine.update(deltaTime);
 
-        // 2. 게임 상태 렌더링
-        this.renderer.render(this.gameEngine.getGameState(), deltaTime);
+            // 2. 게임 상태 렌더링
+            this.renderer.render(this.gameEngine.getGameState(), deltaTime);
+        }
 
         // 다음 프레임 요청
         requestAnimationFrame(this.loop.bind(this));

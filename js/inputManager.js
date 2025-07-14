@@ -10,6 +10,7 @@ class InputManager {
         this.keys = new Set(); // 현재 눌려진 키를 저장
         this.mouse = { x: 0, y: 0, buttons: new Set() }; // 마우스 위치 및 버튼 상태
         this.touch = []; // 터치 입력 정보 (다중 터치 지원)
+        this.clickListeners = []; // 외부에서 클릭을 구독할 수 있도록
 
         // 키보드 이벤트 리스너
         window.addEventListener('keydown', this._onKeyDown.bind(this));
@@ -19,6 +20,7 @@ class InputManager {
         this.canvas.addEventListener('mousemove', this._onMouseMove.bind(this));
         this.canvas.addEventListener('mousedown', this._onMouseDown.bind(this));
         this.canvas.addEventListener('mouseup', this._onMouseUp.bind(this));
+        this.canvas.addEventListener('click', this._onClick.bind(this));
         this.canvas.addEventListener('contextmenu', this._onContextMenu.bind(this)); // 우클릭 메뉴 방지
 
         // 터치 이벤트 리스너 (모바일 기기용)
@@ -51,6 +53,16 @@ class InputManager {
 
     _onMouseUp(event) {
         this.mouse.buttons.delete(event.button);
+    }
+
+    _onClick(event) {
+        for (const listener of this.clickListeners) {
+            try {
+                listener(event);
+            } catch (e) {
+                console.error('InputManager click listener error:', e);
+            }
+        }
     }
 
     _onContextMenu(event) {
@@ -111,5 +123,11 @@ class InputManager {
     // 다음 프레임을 위한 입력 상태 리셋 (필요시)
     resetInputState() {
         // 예를 들어, 클릭/탭 한 번만 감지해야 하는 경우 여기에 리셋 로직 추가
+    }
+
+    addClickListener(listener) {
+        if (typeof listener === 'function') {
+            this.clickListeners.push(listener);
+        }
     }
 }
