@@ -468,9 +468,16 @@ class Renderer {
         return matrix;
     }
 
+    setClearColor(r, g, b, a) {
+        this.gl.clearColor(r, g, b, a);
+    }
+
+    clear() {
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+    }
+
 
     render(gameState, deltaTime) {
-        this.res.beginFrame();
         this.gl.viewport(0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
@@ -516,8 +523,6 @@ class Renderer {
              this.drawColorRect(this.gl, px, py, pw, ph, [0.1, 0.5, 0.8, 1.0], null);
         }
 
-
-        this.res.endFrame();
 
         this.panels.render(deltaTime);
     }
@@ -718,7 +723,7 @@ test('Renderer Tests', async (t) => {
 
         renderer.render(gameState, deltaTime);
 
-        assert.strictEqual(mockResEngine.beginFrame.mock.callCount(), 1, 'ResolutionEngine.beginFrame called');
+        assert.strictEqual(mockResEngine.beginFrame.mock.callCount(), 0, 'ResolutionEngine.beginFrame should not be called');
         assert.strictEqual(mockGL.viewport.mock.callCount(), 1, 'GL viewport set');
         assert.strictEqual(mockGL.clear.mock.callCount(), 1, 'GL clear called');
 
@@ -738,7 +743,7 @@ test('Renderer Tests', async (t) => {
         assert.strictEqual(mockPanelEngine.render.mock.callCount(), 1, 'PanelEngine.render called');
         assert.strictEqual(mockPanelEngine.render.mock.calls[0].arguments[0], deltaTime, 'PanelEngine.render receives deltaTime');
 
-        assert.strictEqual(mockResEngine.endFrame.mock.callCount(), 1, 'ResolutionEngine.endFrame called');
+        assert.strictEqual(mockResEngine.endFrame.mock.callCount(), 0, 'ResolutionEngine.endFrame should not be called');
     });
 });
 

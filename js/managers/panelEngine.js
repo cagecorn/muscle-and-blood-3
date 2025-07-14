@@ -67,6 +67,14 @@ class PanelEngine {
         console.log(`Panel '${panel.id}' resized to ${measuredWidth}x${measuredHeight}`);
     }
 
+    // 새로 추가된 메서드: 등록된 모든 패널의 크기와 스타일을 다시 적용
+    resizeAllPanels() {
+        this.panels.forEach(panel => {
+            this._applyPanelStyle(panel);
+        });
+        console.log('PanelEngine: All panels resized.');
+    }
+
     getPanel(panelId) {
         return this.panels.get(panelId);
     }

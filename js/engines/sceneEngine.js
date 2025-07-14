@@ -1,11 +1,12 @@
 // js/engines/sceneEngine.js
 class SceneEngine {
-    constructor(renderer, uiEngine, panelEngine, battleLogEngine, cameraEngine) {
+    constructor(renderer, uiEngine, panelEngine, battleLogEngine, cameraEngine, resolutionEngine) {
         this.renderer = renderer;
         this.uiEngine = uiEngine;
         this.panelEngine = panelEngine;
         this.battleLogEngine = battleLogEngine;
         this.cameraEngine = cameraEngine;
+        this.resolutionEngine = resolutionEngine;
         this.scenes = {}; // 씬들을 저장할 객체
         this.currentScene = null;
         console.log("SceneEngine initialized.");
@@ -49,8 +50,14 @@ class SceneEngine {
 
     // 현재 씬의 그리기 메서드 호출
     draw(renderer) {
+        this.resolutionEngine.beginFrame();
+        this.renderer.gl.viewport(0, 0, this.renderer.gl.drawingBufferWidth, this.renderer.gl.drawingBufferHeight);
+
         if (this.currentScene && this.scenes[this.currentScene]) {
             this.scenes[this.currentScene].draw(renderer);
         }
+
+        this.panelEngine.render(null);
+        this.resolutionEngine.endFrame();
     }
 }

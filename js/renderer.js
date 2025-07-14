@@ -347,11 +347,20 @@ class Renderer {
         return matrix;
     }
 
+    // 새로 추가된 메서드: 캔버스 배경색 설정
+    setClearColor(r, g, b, a) {
+        this.gl.clearColor(r, g, b, a);
+    }
+
+    // 새로 추가된 메서드: 캔버스 지우기
+    clear() {
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+    }
+
 
     // 게임 상태를 화면에 그리기
     render(gameState, deltaTime) {
-        // 메인 게임 캔버스 렌더링 시작
-        this.res.beginFrame();
+        // 메인 게임 캔버스 렌더링 시작은 SceneEngine이 담당
         this.gl.viewport(0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT); // 매 프레임 버퍼 지우기
 
@@ -416,7 +425,7 @@ class Renderer {
         }
 
 
-        this.res.endFrame(); // 메인 게임 캔버스 렌더링 종료
+        // 메인 게임 캔버스 렌더링 종료는 SceneEngine이 담당
 
         // 각 오버레이 패널 캔버스 렌더링
         // PanelEngine의 render 메서드가 각 패널의 자체 컨텍스트에 그리는 것을 관리합니다.
