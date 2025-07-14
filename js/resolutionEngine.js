@@ -95,3 +95,9 @@ class ResolutionEngine {
     }
 }
 
+// Export for Node.js environments
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = ResolutionEngine;
+}
+
+
