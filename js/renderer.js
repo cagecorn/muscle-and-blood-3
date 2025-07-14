@@ -6,15 +6,25 @@ class Renderer {
             console.error("ResolutionEngine and MeasurementEngine instances are required for Renderer.");
             return;
         }
-        this.res = resolutionEngine; // 해상도 엔진 인스턴스
-        this.measure = measurementEngine; // 측량 엔진 인스턴스
-        this.gl = this.res.getGLContext(); // WebGL 컨텍스트
-        this.internalRes = this.res.getInternalResolution(); // 내부 해상도
+        this.res = resolutionEngine;
+        this.measure = measurementEngine;
+        this.gl = this.res.getGLContext();
+        this.internalRes = this.res.getInternalResolution();
 
-        // WebGL 초기화 (셰이더 프로그램, 버퍼 등 설정)
-        this.initWebGL();
+        this.panelContexts = {}; // 오버레이 패널들의 GL 컨텍스트 보관
+
+        this.initWebGL(); // 메인 캔버스 초기화
 
         console.log("Renderer initialized.");
+    }
+
+    // 다른 캔버스(패널)의 GL 컨텍스트를 추가합니다.
+    addPanelContext(name, glContext, canvasElement) {
+        this.panelContexts[name] = {
+            gl: glContext,
+            canvas: canvasElement
+        };
+        console.log(`Added panel context: ${name}`);
     }
 
     initWebGL() {
@@ -61,7 +71,7 @@ class Renderer {
         this.gl.enableVertexAttribArray(this.positionAttributeLocation);
         this.gl.vertexAttribPointer(this.positionAttributeLocation, 2, this.gl.FLOAT, false, 0, 0);
 
-        console.log("WebGL initialized with basic shaders.");
+        console.log("Main WebGL initialized with basic shaders.");
     }
 
     createShader(type, source) {
@@ -90,28 +100,25 @@ class Renderer {
 
     // 게임 상태를 화면에 그리기
     render(gameState, deltaTime) {
-        this.res.beginFrame(); // 해상도 엔진에게 렌더링 시작을 알림
+        // 메인 게임 캔버스 렌더링
+        this.res.beginFrame();
 
-        // 여기에 실제 게임 오브젝트(용병, 몬스터, UI 등)를 그리는 코드가 들어갑니다.
-        // 모든 그리기 작업은 this.gl (WebGL 컨텍스트)을 사용하고,
-        // 크기 및 위치는 this.measure (측량 엔진)에서 얻어야 합니다.
-
-        // 예시: 캔버스 중앙에 작은 사각형 그리기
-        // 이 예시 셰이더는 정규화된 좌표(-1.0 ~ 1.0)를 사용하므로,
-        // 실제 internalRes 값을 기반으로 오브젝트 위치를 변환해야 합니다.
-        // 복잡한 2D 렌더링을 위해서는 투영 행렬을 사용해야 합니다.
-
-        // 현재 예시 셰이더는 고정된 사각형을 그림
+        this.gl.useProgram(this.shaderProgram);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.gl.getBufferParameter(this.gl.ARRAY_BUFFER, this.gl.ARRAY_BUFFER_BINDING));
+        this.gl.vertexAttribPointer(this.positionAttributeLocation, 2, this.gl.FLOAT, false, 0, 0);
         this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
 
-        // 예시: UI 요소를 그리는 로직의 일부
-        // const buttonWidth = this.measure.getButtonWidth();
-        // const buttonHeight = this.measure.getButtonHeight();
-        // const buttonX = this.measure.getPixelX(this.internalRes.width / 2 - this.measure.baseButtonWidth / 2);
-        // const buttonY = this.measure.getPixelY(this.internalRes.height - this.measure.baseButtonHeight - this.measure.basePadding);
+        this.res.endFrame();
 
-        // console.log(`Rendering... Button position: (${buttonX}, ${buttonY}), size: ${buttonWidth}x${buttonHeight}`);
-
-        this.res.endFrame(); // 해상도 엔진에게 렌더링 종료를 알림
+        // 각 오버레이 패널 캔버스 렌더링
+        for (const name in this.panelContexts) {
+            const panel = this.panelContexts[name];
+            if (panel.gl) {
+                panel.gl.viewport(0, 0, panel.gl.drawingBufferWidth, panel.gl.drawingBufferHeight);
+                panel.gl.clearColor(0.0, 0.0, 0.0, 0.0); // 완전히 투명하게
+                panel.gl.clear(panel.gl.COLOR_BUFFER_BIT);
+                // 패널별 추가 렌더링 로직은 여기서 수행
+            }
+        }
     }
 }
