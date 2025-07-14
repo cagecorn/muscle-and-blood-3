@@ -17,17 +17,17 @@ export const CLASSES = {
         name: '전사',
         role: CLASS_ROLES.MELEE_DPS,
         description: '강력한 근접 공격과 방어력을 겸비한 병종.',
-        skills: ['skill_melee_attack', 'skill_shield_block'],
+        skills: ['skill_melee_attack', 'skill_shield_block'], //예시, 실제 있는 스킬 아님.
         moveRange: 3 // 전사의 이동 거리
     },
-    // ✨ 새롭게 추가된 해골 클래스
-    SKELETON: {
+    // ✨ 새롭게 추가된 좀비 클래스
+    zombie: {
         id: 'class_skeleton',
-        name: '해골',
+        name: '좀비',
         role: CLASS_ROLES.MELEE_DPS,
         description: '다수로 몰려오는 기본적인 언데드 적.',
-        skills: ['skill_melee_attack'],
-        moveRange: 2 // 해골의 이동 거리(예시)
+        skills: ['skill_melee_attack'], //예시, 실제 있는 스킬 아님.
+        moveRange: 2 // 좀비의 이동 거리(예시)
     }
     // 다른 클래스들이 여기에 추가됩니다.
     // MAGE: { id: 'class_mage', ... }
