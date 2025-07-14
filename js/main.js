@@ -35,7 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. 게임 엔진 초기화
     const gameEngine = new GameEngine(measurementEngine);
 
-    // 6. 매니저 엔진들 초기화 (순서 중요)
+    // 6. 매니저 엔진들 초기화
+    // CameraEngine을 가장 먼저 생성하여 Renderer에서 바로 사용할 수 있도록 합니다.
     const cameraEngine = new CameraEngine(resolutionEngine);
     const layerEngine = new LayerEngine();
     const tempRenderer = {}; // 순환 의존성 방지용 임시 객체
