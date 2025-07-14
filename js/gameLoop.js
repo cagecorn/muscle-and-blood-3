@@ -1,13 +1,16 @@
 // gameLoop.js
 
 class GameLoop {
-    constructor(gameEngine, renderer) {
+    constructor(gameEngine, renderer, panelEngine = null, uiEngine = null, delayEngine = null) {
         if (!gameEngine || !renderer) {
             console.error("GameEngine and Renderer instances are required for GameLoop.");
             return;
         }
         this.gameEngine = gameEngine;
         this.renderer = renderer;
+        this.panelEngine = panelEngine;
+        this.uiEngine = uiEngine;
+        this.delayEngine = delayEngine;
         this.lastTime = 0;
         this.isRunning = false;
 
@@ -38,6 +41,9 @@ class GameLoop {
 
         // 1. 게임 로직 업데이트
         this.gameEngine.update(deltaTime);
+        if (this.panelEngine) this.panelEngine.update(deltaTime);
+        if (this.uiEngine) this.uiEngine.update(deltaTime);
+        if (this.delayEngine) this.delayEngine.update(deltaTime);
 
         // 2. 게임 상태 렌더링
         this.renderer.render(this.gameEngine.getGameState(), deltaTime);
