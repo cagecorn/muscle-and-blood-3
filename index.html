@@ -4,15 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Muscle and Blood 3</title>
-    <link rel="stylesheet" href="style.css"> </head>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-    <canvas id="gameCanvas"></canvas>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <canvas id="mercenaryPanelCanvas" class="overlay-canvas"></canvas>
+        <canvas id="combatLogCanvas" class="overlay-canvas"></canvas>
+    </div>
 
-    <script src="resolutionEngine.js"></script>
-    <script src="measurementEngine.js"></script>
-    <script src="gameEngine.js"></script>
-    <script src="renderer.js"></script>
-    <script src="gameLoop.js"></script>
-    <script src="main.js"></script>
+    <script src="js/resolutionEngine.js"></script>
+    <script src="js/measurementEngine.js"></script>
+    <script src="js/gameEngine.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/gameLoop.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
