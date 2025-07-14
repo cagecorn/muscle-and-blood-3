@@ -1,18 +1,14 @@
 class GridEngine {
-    constructor(measurementEngine) {
-        if (!measurementEngine) {
-            console.error("MeasurementEngine instance is required for GridEngine.");
+    constructor(measurementEngine, renderer) {
+        if (!measurementEngine || !renderer) {
+            console.error("MeasurementEngine and Renderer instances are required for GridEngine.");
             return;
         }
         this.measure = measurementEngine;
-        console.log('GridEngine initialized.');
+        this.renderer = renderer;
+        console.log("GridEngine initialized.");
     }
 
-    /**
-     * Draw grid lines on the given WebGL context.
-     * @param {WebGLRenderingContext} gl
-     * @param {Object} options
-     */
     drawGrid(gl, options) {
         const {
             x, y, width, height, rows, cols,
@@ -22,45 +18,15 @@ class GridEngine {
         } = options;
 
         if (!gl) {
-            console.warn('GridEngine: No WebGL context provided for drawing grid.');
+            console.warn("GridEngine: No WebGL context provided for drawing grid.");
             return;
         }
 
-        const startX = this.measure.getPixelX(x);
-        const startY = this.measure.getPixelY(y);
-        const gridWidth = this.measure.getPixelX(width);
-        const gridHeight = this.measure.getPixelY(height);
+        const startX = x;
+        const startY = y;
+        const gridWidth = width;
+        const gridHeight = height;
         const pixelLineWidth = this.measure.getPixelSize(lineWidth);
-
-        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-        const shaderProgram = gl.getParameter(gl.CURRENT_PROGRAM);
-        if (!shaderProgram) {
-            console.error('GridEngine: No active WebGL shader program found. Cannot draw grid lines.');
-            return;
-        }
-        gl.useProgram(shaderProgram);
-
-        const projectionMatrixLocation = gl.getUniformLocation(shaderProgram, 'u_projectionMatrix');
-        const viewMatrixLocation = gl.getUniformLocation(shaderProgram, 'u_viewMatrix');
-        const modelMatrixLocation = gl.getUniformLocation(shaderProgram, 'u_modelMatrix');
-        const colorLocation = gl.getUniformLocation(shaderProgram, 'u_color');
-        const positionAttributeLocation = gl.getAttribLocation(shaderProgram, 'a_position');
-
-        let projectionMatrix, viewMatrix;
-        if (camera) {
-            projectionMatrix = camera.getProjectionMatrix();
-            viewMatrix = camera.getViewMatrix();
-        } else {
-            projectionMatrix = this._createOrthographicMatrix(0, gl.canvas.width, gl.canvas.height, 0, -1, 1);
-            viewMatrix = mat4.identity();
-        }
-
-        gl.uniformMatrix4fv(projectionMatrixLocation, false, projectionMatrix);
-        gl.uniformMatrix4fv(viewMatrixLocation, false, viewMatrix);
-        gl.uniform4fv(colorLocation, lineColor);
-
-        gl.lineWidth(pixelLineWidth);
 
         const positions = [];
 
@@ -78,19 +44,7 @@ class GridEngine {
             positions.push(xPos, startY + gridHeight);
         }
 
-        const positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-        gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
-
-        const modelMatrix = mat4.identity();
-        gl.uniformMatrix4fv(modelMatrixLocation, false, modelMatrix);
-
-        gl.drawArrays(gl.LINES, 0, positions.length / 2);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-        gl.lineWidth(1.0);
+        this.renderer.drawLines(gl, new Float32Array(positions), lineColor, pixelLineWidth, camera, gl.LINES);
     }
 
     _createOrthographicMatrix(left, right, bottom, top, near, far) {

@@ -35,32 +35,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. 게임 엔진 초기화
     const gameEngine = new GameEngine(measurementEngine);
 
-    // 6. 렌더러 초기화
+    // 6. 매니저 엔진들 초기화 (순서 중요)
     const cameraEngine = new CameraEngine(resolutionEngine);
     const layerEngine = new LayerEngine();
-    const tempRenderer = {}; // placeholder for circular dependency
+    const tempRenderer = {}; // 순환 의존성 방지용 임시 객체
     const panelEngine = new PanelEngine(measurementEngine, tempRenderer);
     const uiEngine = new UIEngine(measurementEngine, inputManager);
+    const turnEngine = new TurnEngine(gameEngine);
+    const delayEngine = new DelayEngine();
+
+    // Renderer는 GridEngine보다 먼저 생성되어야 합니다.
     const renderer = new Renderer(resolutionEngine, measurementEngine, cameraEngine, layerEngine, panelEngine, uiEngine);
     if (mercenaryPanelGl) renderer.addPanelContext('mercenaryPanelCanvas', mercenaryPanelGl, mercenaryPanelCanvas);
     if (combatLogGl) renderer.addPanelContext('combatLogCanvas', combatLogGl, combatLogCanvas);
     panelEngine.renderer = renderer;
-    renderer.setBattleGridManager(battleGridManager);
-    renderer.setBattleStageManager(battleStageManager);
-    battleStageManager.renderer = renderer;
 
     // 7. 디버그 매니저 초기화
     const debugManager = new DebugManager('gameCanvas', true);
 
     // 8. 추가 엔진들
-    const turnEngine = new TurnEngine(gameEngine);
-    const delayEngine = new DelayEngine();
-
-    const gridEngine = new GridEngine(measurementEngine);
+    const gridEngine = new GridEngine(measurementEngine, renderer);
     const battleLogEngine = new BattleLogEngine(panelEngine, measurementEngine);
+    const battleStageManager = new BattleStageManager(assetLoader, renderer, cameraEngine, resolutionEngine);
     const battleGridManager = new BattleGridManager(gridEngine, cameraEngine, measurementEngine, resolutionEngine);
     const mercenaryPanelGridManager = new MercenaryPanelGridManager(gridEngine, panelEngine, measurementEngine);
-    const battleStageManager = new BattleStageManager(assetLoader, null, cameraEngine, resolutionEngine);
+
+    // 전역 노출 (개발 편의용)
+    window.battleStageManagerInstance = battleStageManager;
+    window.battleGridManagerInstance = battleGridManager;
+    window.mercenaryPanelGridManagerInstance = mercenaryPanelGridManager;
 
     // 9. 게임 루프 초기화
     const gameLoop = new GameLoop(gameEngine, renderer, panelEngine, uiEngine, delayEngine);
