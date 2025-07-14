@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "description": "Turn-based auto battle RPG prototype",
   "scripts": {
-    "start": "lite-server"
+    "start": "lite-server",
+    "test": "node --test"
   },
   "devDependencies": {
     "lite-server": "^2.6.1"

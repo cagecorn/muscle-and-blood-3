@@ -53,7 +53,9 @@ class MeasurementEngine {
         this.scaleY = this.resolutionEngine.canvas.height / this.internalResolution.height;
 
         // 캔버스 크기가 변경될 때마다 스케일링 비율을 업데이트하도록 리스너 추가
-        window.addEventListener('resize', this._updateScaleFactors.bind(this));
+        if (typeof window !== 'undefined') {
+            window.addEventListener('resize', this._updateScaleFactors.bind(this));
+        }
     }
 
     // 캔버스 크기 변경 시 스케일링 비율 업데이트
@@ -240,3 +242,8 @@ class MeasurementEngine {
 //     requestAnimationFrame(gameLoop);
 // }
 */
+
+// Export for Node.js environments
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = MeasurementEngine;
+}
