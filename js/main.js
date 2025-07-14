@@ -20,37 +20,43 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Failed to get main WebGL context. Game cannot run.");
         return;
     }
-    // 경고 메시지는 유지하되, 게임 진행에 필수적이지는 않음을 나타냄
     if (!mercenaryPanelGl) { console.warn("Failed to get mercenary panel WebGL context."); }
     if (!combatLogGl) { console.warn("Failed to get combat log WebGL context."); }
 
     // 2. 측량 엔진 초기화
     const measurementEngine = new MeasurementEngine(resolutionEngine);
 
-    // 3. 인풋 매니저 초기화 (메인 게임 캔버스에 이벤트를 리스닝)
+    // 3. 인풋 매니저 초기화
     const inputManager = new InputManager(resolutionEngine.canvas);
 
-    // 4. 에셋 로더 초기화 (메인 GL 컨텍스트 전달)
+    // 4. 에셋 로더 초기화
     const assetLoader = new AssetLoader(gl);
 
     // 5. 게임 엔진 초기화
     const gameEngine = new GameEngine(measurementEngine);
-    // (선택 사항) 게임 엔진에 InputManager를 전달하여 게임 로직에서 입력 상태를 확인하도록 할 수 있음
-    // gameEngine.setInputManager(inputManager);
 
     // 6. 렌더러 초기화
-    const renderer = new Renderer(resolutionEngine, measurementEngine);
-    // 렌더러에 각 패널 캔버스의 GL 컨텍스트를 전달
-    if (mercenaryPanelGl) renderer.addPanelContext('mercenaryPanel', mercenaryPanelGl, mercenaryPanelCanvas);
-    if (combatLogGl) renderer.addPanelContext('combatLog', combatLogGl, combatLogCanvas);
+    const cameraEngine = new CameraEngine(resolutionEngine);
+    const layerEngine = new LayerEngine();
+    const tempRenderer = {}; // placeholder for circular dependency
+    const panelEngine = new PanelEngine(measurementEngine, tempRenderer);
+    const uiEngine = new UIEngine(measurementEngine, inputManager);
+    const renderer = new Renderer(resolutionEngine, measurementEngine, cameraEngine, layerEngine, panelEngine, uiEngine);
+    if (mercenaryPanelGl) renderer.addPanelContext('mercenaryPanelCanvas', mercenaryPanelGl, mercenaryPanelCanvas);
+    if (combatLogGl) renderer.addPanelContext('combatLogCanvas', combatLogGl, combatLogCanvas);
+    panelEngine.renderer = renderer;
 
-    // 7. 디버그 매니저 초기화 (선택 사항)
-    const debugManager = new DebugManager('gameCanvas', true); // true: 디버그 HUD 활성화
+    // 7. 디버그 매니저 초기화
+    const debugManager = new DebugManager('gameCanvas', true);
 
-    // 8. 게임 루프 초기화
+    // 8. 추가 엔진들
+    const turnEngine = new TurnEngine(gameEngine);
+    const delayEngine = new DelayEngine();
+
+    // 9. 게임 루프 초기화
     const gameLoop = new GameLoop(gameEngine, renderer);
 
-    // 게임 초기 설정 (예: 초기 맵 로드, 플레이어 생성 등)
+    // 게임 초기 설정
     gameEngine.initializeGame();
 
     // ----------------------------------------------------
@@ -65,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const { type, payload, originalRequestId } = event.data;
             if (type === 'COMBAT_STEP_RESULT') {
                 console.log(`Main: Received combat result for request ${originalRequestId}:`, payload);
-                // TODO: gameEngine.applyCombatResult(payload);
             } else if (type === 'CALCULATION_ERROR') {
                 console.error(`Main: Combat calculation error for request ${originalRequestId}:`, payload);
             }
@@ -114,48 +119,62 @@ document.addEventListener('DOMContentLoaded', () => {
         assetsToLoad,
         (loaded, total) => {
             console.log(`Loading assets: ${loaded}/${total}`);
-            // 여기에서 로딩 바 UI를 업데이트할 수 있습니다.
         },
         () => {
             console.log("All assets loaded. Starting game loop.");
-            // 모든 에셋 로드 완료 후 게임 루프 시작
             gameLoop.start();
+
+            panelEngine.registerPanel('mercenaryPanelCanvas', {
+                width: measurementEngine.internalResolution.width,
+                height: 100,
+                x: 0, y: 0
+            });
+            panelEngine.registerPanel('combatLogCanvas', {
+                width: measurementEngine.internalResolution.width,
+                height: 150,
+                x: 0, y: measurementEngine.internalResolution.height - 150
+            });
+
+            uiEngine.registerUIElement('startButton', 'button', {
+                x: measurementEngine.internalResolution.width / 2 - 100,
+                y: measurementEngine.internalResolution.height / 2 - 30,
+                width: 200, height: 60,
+                text: '게임 시작',
+                fontSize: measurementEngine.getFontSizeLarge(),
+                color: '#00FF00'
+            }, () => {
+                console.log('Start Button Clicked!');
+            });
+
+            delayEngine.addDelay(() => {
+                console.log('5초 후 메시지: 딜레이 엔진 작동 완료!');
+            }, 5000, 'introDelay');
         }
     );
 
-    // 게임 루프 시작을 에셋 로딩 완료 후로 이동시켰습니다.
-    // 만약 로딩 UI가 필요 없다면 바로 gameLoop.start();를 호출해도 됩니다.
-
-
     // (선택 사항) 디버그 정보 업데이트를 게임 루프에서 처리
     let totalGameTime = 0;
-    // 기존 gameLoop의 loop 함수를 직접 수정하거나, GameLoop 클래스에 콜백을 추가하는 방식 고려
-    // 간단한 테스트를 위해 여기에 임시 루프를 추가합니다. 실제로는 GameLoop 내부에서 처리되어야 합니다.
     function mainGameLoopTick(currentTime) {
         const deltaTime = currentTime - (mainGameLoopTick.lastTime || currentTime);
         mainGameLoopTick.lastTime = currentTime;
         totalGameTime += deltaTime;
 
-        // debugManager가 활성화되어 있다면 업데이트
         if (debugManager.isEnabled) {
-             debugManager.update(deltaTime, totalGameTime, inputManager);
+            debugManager.update(deltaTime, totalGameTime, inputManager);
         }
 
-        // 실제 gameLoop.js의 loop 함수에서 gameEngine.update()와 renderer.render()가 호출됩니다.
-        // 현재는 assetLoader.load 콜백에서 gameLoop.start()를 호출하므로,
-        // 여기의 mainGameLoopTick은 디버깅용 임시 루프입니다.
-        // 실제 통합 시에는 gameLoop.js의 loop 함수에 debugManager.update 호출을 추가해야 합니다.
-        // requestAnimationFrame(mainGameLoopTick); // 이 줄은 실제 gameLoop에서 호출됩니다.
+        panelEngine.update(deltaTime);
+        uiEngine.update(deltaTime);
+        delayEngine.update(deltaTime);
     }
-    // requestAnimationFrame(mainGameLoopTick); // 디버그 매니저를 위한 임시 루프 시작 (실제는 GameLoop 내부)
 
-    // 디버그 HUD 토글을 위한 키 이벤트 (예: F12 키)
     window.addEventListener('keydown', (event) => {
-        if (event.key === 'F12' && debugManager.isEnabled !== undefined) { // F12키를 눌렀을 때
-            event.preventDefault(); // 브라우저 개발자 도구 열림 방지
+        if (event.key === 'F12' && debugManager.isEnabled !== undefined) {
+            event.preventDefault();
             debugManager.toggleEnabled();
         }
     });
 
-    console.log("Game initialization script finished.");
+    console.log('Game initialization script finished.');
 });
+
