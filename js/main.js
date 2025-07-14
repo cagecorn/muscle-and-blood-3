@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mercenaryPanelGl) renderer.addPanelContext('mercenaryPanelCanvas', mercenaryPanelGl, mercenaryPanelCanvas);
     if (combatLogGl) renderer.addPanelContext('combatLogCanvas', combatLogGl, combatLogCanvas);
     panelEngine.renderer = renderer;
+    renderer.setBattleGridManager(battleGridManager);
+    renderer.setBattleStageManager(battleStageManager);
+    battleStageManager.renderer = renderer;
 
     // 7. 디버그 매니저 초기화
     const debugManager = new DebugManager('gameCanvas', true);
@@ -53,8 +56,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const turnEngine = new TurnEngine(gameEngine);
     const delayEngine = new DelayEngine();
 
+    const gridEngine = new GridEngine(measurementEngine);
+    const battleLogEngine = new BattleLogEngine(panelEngine, measurementEngine);
+    const battleGridManager = new BattleGridManager(gridEngine, cameraEngine, measurementEngine, resolutionEngine);
+    const mercenaryPanelGridManager = new MercenaryPanelGridManager(gridEngine, panelEngine, measurementEngine);
+    const battleStageManager = new BattleStageManager(assetLoader, null, cameraEngine, resolutionEngine);
+
     // 9. 게임 루프 초기화
-    const gameLoop = new GameLoop(gameEngine, renderer);
+    const gameLoop = new GameLoop(gameEngine, renderer, panelEngine, uiEngine, delayEngine);
 
     // 게임 초기 설정
     gameEngine.initializeGame();
@@ -109,10 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 게임 에셋 로딩 예시
     // ----------------------------------------------------
     const assetsToLoad = [
-        // { name: 'tile_grass', type: 'image', url: 'assets/tiles/grass.png' },
-        // { name: 'ui_button', type: 'image', url: 'assets/ui/button.png' },
-        // { name: 'bg_music', type: 'audio', url: 'assets/audio/bg_music.mp3' },
-        // { name: 'merc_data', type: 'json', url: 'assets/data/mercenaries.json' },
+        { name: 'bg_music', type: 'audio', url: 'assets/audio/bg_music.mp3' },
+        { name: 'merc_data', type: 'json', url: 'assets/data/mercenaries.json' },
+        { name: battleStageManager.backgroundAssetId, type: 'image', url: battleStageManager.backgroundUrl }
     ];
 
     assetLoader.load(
@@ -123,17 +131,18 @@ document.addEventListener('DOMContentLoaded', () => {
         () => {
             console.log("All assets loaded. Starting game loop.");
             gameLoop.start();
+            battleStageManager.onAssetsLoaded();
 
             panelEngine.registerPanel('mercenaryPanelCanvas', {
                 width: measurementEngine.internalResolution.width,
                 height: 100,
                 x: 0, y: 0
-            });
+            }, true);
             panelEngine.registerPanel('combatLogCanvas', {
                 width: measurementEngine.internalResolution.width,
                 height: 150,
                 x: 0, y: measurementEngine.internalResolution.height - 150
-            });
+            }, false);
 
             uiEngine.registerUIElement('startButton', 'button', {
                 x: measurementEngine.internalResolution.width / 2 - 100,
@@ -144,10 +153,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 color: '#00FF00'
             }, () => {
                 console.log('Start Button Clicked!');
+                battleLogEngine.addLog('게임이 시작되었습니다!', 'cyan');
             });
 
             delayEngine.addDelay(() => {
                 console.log('5초 후 메시지: 딜레이 엔진 작동 완료!');
+                battleLogEngine.addLog('5초 딜레이가 종료되었습니다.', 'orange');
             }, 5000, 'introDelay');
         }
     );
