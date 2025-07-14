@@ -47,9 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Renderer는 GridEngine보다 먼저 생성되어야 합니다.
     const renderer = new Renderer(resolutionEngine, measurementEngine, cameraEngine, layerEngine, panelEngine, uiEngine);
-    if (mercenaryPanelGl) renderer.addPanelContext('mercenaryPanelCanvas', mercenaryPanelGl, mercenaryPanelCanvas);
-    if (combatLogGl) renderer.addPanelContext('combatLogCanvas', combatLogGl, combatLogCanvas);
+    Object.assign(tempRenderer, renderer);
     panelEngine.renderer = renderer;
+    uiEngine.renderer = renderer;
 
     // ✨ 패널 등록을 MercenaryPanelGridManager 초기화보다 먼저 수행
     // assetLoader.load가 완료될 때까지 기다릴 필요 없이 즉시 등록합니다.
@@ -63,6 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
         height: 150,
         x: 0, y: measurementEngine.internalResolution.height - 150
     }, false);
+
+    // 패널들을 기본적으로 비활성화해 둔다.
+    panelEngine.setPanelVisibility('mercenaryPanelCanvas', false);
+    panelEngine.setPanelVisibility('combatLogCanvas', false);
 
     // 7. 디버그 매니저 초기화
     const debugManager = new DebugManager('gameCanvas', true);
@@ -171,9 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
             sceneEngine.registerScene('battle', {
                 activate: () => {
                     console.log("SceneEngine: Activating Battle Scene.");
-                    battleLogEngine.addLog("전투 씬에 진입했습니다.", "red");
+                    battleLogEngine.addLog("전투 씬에 진입했습니다!", "red");
                     battleStageManager.onAssetsLoaded();
-                    uiEngine.unregisterUIElement('startButton');
+                    // 패널들을 필요에 따라 활성화할 수 있습니다.
+                    // panelEngine.setPanelVisibility('mercenaryPanelCanvas', true);
+                    // panelEngine.setPanelVisibility('combatLogCanvas', true);
                 },
                 deactivate: () => {
                     console.log("SceneEngine: Deactivating Battle Scene.");
@@ -182,15 +188,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     battleGridManager.update(dt);
                 },
                 draw: (renderer) => {
-                    renderer.setClearColor(0.0, 0.0, 0.0, 1.0);
+                    renderer.setClearColor(0.0, 0.0, 0.0, 1.0); // 전투 씬은 검은색 배경
                     renderer.clear();
-                    battleStageManager.draw(renderer);
-                    battleGridManager.draw(renderer);
+                    renderer.render(gameEngine.getGameState(), 0);
                 }
             });
 
-            // ✨ 게임 시작 시 'territory' 씬 로드
-            sceneEngine.loadScene('territory');
+            // ✨ 게임 시작 시 'battle' 씬으로 바로 로드
+            sceneEngine.loadScene('battle');
 
             delayEngine.addDelay(() => {
                 console.log('5초 후 메시지: 딜레이 엔진 작동 완료!');
