@@ -1,0 +1,11 @@
+{
+  "name": "muscle-and-blood-3",
+  "version": "0.1.0",
+  "description": "Turn-based auto battle RPG prototype",
+  "scripts": {
+    "start": "lite-server"
+  },
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  }
+}
