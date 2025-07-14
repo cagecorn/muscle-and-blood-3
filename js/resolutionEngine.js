@@ -22,14 +22,8 @@ class ResolutionEngine {
 
         this.aspectRatio = internalWidth / internalHeight;
 
-        // 고해상도 에셋의 선명도를 위한 텍스처 필터링 설정
-        // 512x512와 같은 큰 타일은 Nearest 필터링 시 너무 "픽셀화"되어 보일 수 있으므로,
-        // 보다 부드러운 스케일링을 위해 LINEAR 필터링을 기본으로 고려합니다.
-        // 만약 512x512 타일도 '픽셀 아트'처럼 각 픽셀이 선명해야 한다면 NEAREST를 사용해야 합니다.
-        // 여기서는 '초초초초고화질'이므로 일반적인 고화질 렌더링에 적합한 LINEAR를 가정합니다.
-        // 필요에 따라 NEAREST로 변경하여 픽셀 아트 효과를 극대화할 수 있습니다.
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        // 고해상도 에셋의 선명도를 위한 텍스처 필터링 설정은
+        // AssetLoader가 텍스처를 로드할 때 처리하므로 여기서는 설정하지 않습니다.
 
 
         // 화면 크기 변경 감지 및 캔버스 리사이징
