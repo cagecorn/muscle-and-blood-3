@@ -54,6 +54,53 @@ document.addEventListener('DOMContentLoaded', () => {
     gameEngine.initializeGame();
 
     // ----------------------------------------------------
+    // Web Worker 초기화
+    // ----------------------------------------------------
+
+    // 1. Battle Calculation Worker (Web Worker)
+    let battleWorker;
+    try {
+        battleWorker = new Worker('js/workers/battleCalculationWorker.js');
+        battleWorker.onmessage = (event) => {
+            const { type, payload, originalRequestId } = event.data;
+            if (type === 'COMBAT_STEP_RESULT') {
+                console.log(`Main: Received combat result for request ${originalRequestId}:`, payload);
+                // TODO: gameEngine.applyCombatResult(payload);
+            } else if (type === 'CALCULATION_ERROR') {
+                console.error(`Main: Combat calculation error for request ${originalRequestId}:`, payload);
+            }
+        };
+        battleWorker.onerror = (error) => {
+            console.error('BattleCalculationWorker error:', error);
+        };
+        console.log('BattleCalculationWorker initialized in main.js.');
+    } catch (e) {
+        console.error('Failed to create BattleCalculationWorker:', e);
+    }
+
+    // 2. Event Worker (Shared Worker)
+    let eventWorkerPort;
+    try {
+        const sharedWorker = new SharedWorker('js/workers/eventWorker.js');
+        eventWorkerPort = sharedWorker.port;
+        eventWorkerPort.onmessage = (event) => {
+            const { type, payload } = event.data;
+            console.log('Main: Received message from EventWorker:', type, payload);
+            if (type === 'WORKER_READY') {
+                console.log('EventWorker is ready and connected to main script.');
+                eventWorkerPort.postMessage({ type: 'MAIN_SCRIPT_CONNECTED', payload: { script: 'main.js' } });
+            }
+        };
+        eventWorkerPort.onerror = (error) => {
+            console.error('EventWorker error:', error);
+        };
+        eventWorkerPort.start();
+        console.log('EventWorker initialized in main.js.');
+    } catch (e) {
+        console.error('Failed to create EventWorker:', e);
+    }
+
+    // ----------------------------------------------------
     // 게임 에셋 로딩 예시
     // ----------------------------------------------------
     const assetsToLoad = [
