@@ -115,6 +115,16 @@ class CameraEngine {
         const worldY = internalY / this.zoom + this.position.y;
         return { x: worldX, y: worldY };
     }
+
+    // 새로 추가된 메서드: 카메라 초기화
+    resetCamera() {
+        this.position = { x: 0, y: 0 };
+        this.zoom = 1.0;
+        this.rotation = 0;
+        this.viewMatrix = this.createViewMatrix();
+        this.updateProjectionMatrix();
+        console.log("CameraEngine: Camera reset to default.");
+    }
 }
 
 

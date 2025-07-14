@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mercenaryPanelGridManager = new MercenaryPanelGridManager(gridEngine, panelEngine, measurementEngine);
 
     // ✨ 새로운 엔진들 초기화
-    const sceneEngine = new SceneEngine(renderer, uiEngine, panelEngine, battleLogEngine, cameraEngine);
+    const sceneEngine = new SceneEngine(renderer, uiEngine, panelEngine, battleLogEngine, cameraEngine, resolutionEngine);
     const territoryEngine = new TerritoryEngine(gameEngine, sceneEngine, uiEngine, battleLogEngine, measurementEngine);
 
     // ✨ 인풋 트래킹 디버그 매니저 초기화

@@ -41,7 +41,9 @@ class DebugManager {
             touchPos: 'N/A',
             gameTime: '0s',
             // 추가적인 디버그 정보 (예: 특정 오브젝트 위치, 상태 등)
-            custom: {}
+            custom: {},
+            // 일반 메시지 표시용 배열
+            messages: []
         };
 
         console.log("DebugManager initialized.");
@@ -99,6 +101,13 @@ class DebugManager {
             hudContent += `${key}: ${this.debugInfo.custom[key]}<br>`;
         }
 
+        if (this.debugInfo.messages.length > 0) {
+            hudContent += `--- Messages ---<br>`;
+            this.debugInfo.messages.slice(-5).forEach(msg => {
+                hudContent += `${msg}<br>`;
+            });
+        }
+
         this.debugDiv.innerHTML = hudContent;
     }
 
@@ -108,10 +117,20 @@ class DebugManager {
         this.debugInfo.custom[key] = value;
     }
 
+    // 새로 추가된 메서드: 일반 디버그 메시지 추가
+    addDebugMessage(message) {
+        if (!this.isEnabled) return;
+        this.debugInfo.messages.push(message);
+        if (this.debugInfo.messages.length > 10) {
+            this.debugInfo.messages.shift();
+        }
+    }
+
     // 디버거 활성화/비활성화
     toggleEnabled() {
         this.isEnabled = !this.isEnabled;
         this.debugDiv.style.display = this.isEnabled ? 'block' : 'none';
         console.log(`DebugManager ${this.isEnabled ? 'enabled' : 'disabled'}.`);
+        this.addDebugMessage(`DebugManager: ${this.isEnabled ? 'ON' : 'OFF'}`);
     }
 }

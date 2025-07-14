@@ -20,7 +20,6 @@ class InputManager {
         this.canvas.addEventListener('mousemove', this._onMouseMove.bind(this));
         this.canvas.addEventListener('mousedown', this._onMouseDown.bind(this));
         this.canvas.addEventListener('mouseup', this._onMouseUp.bind(this));
-        this.canvas.addEventListener('click', this._onClick.bind(this));
         this.canvas.addEventListener('contextmenu', this._onContextMenu.bind(this)); // 우클릭 메뉴 방지
 
         // 터치 이벤트 리스너 (모바일 기기용)
@@ -53,16 +52,8 @@ class InputManager {
 
     _onMouseUp(event) {
         this.mouse.buttons.delete(event.button);
-    }
-
-    _onClick(event) {
-        for (const listener of this.clickListeners) {
-            try {
-                listener(event);
-            } catch (e) {
-                console.error('InputManager click listener error:', e);
-            }
-        }
+        // 마우스 버튼이 올라갈 때 클릭 리스너 호출
+        this.clickListeners.forEach(listener => listener(event));
     }
 
     _onContextMenu(event) {

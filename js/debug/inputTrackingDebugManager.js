@@ -15,7 +15,7 @@ class InputTrackingDebugManager {
     // 클릭 이벤트 핸들러
     handleMouseClick(event) {
         if (this.isEnabled) {
-            const rect = event.target.getBoundingClientRect();
+            const rect = this.inputManager.canvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
             this.lastClickCoords = { x: x, y: y };

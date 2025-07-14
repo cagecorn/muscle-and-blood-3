@@ -13,6 +13,7 @@ class GameLoop {
         this.delayEngine = delayEngine;
         this.lastTime = 0;
         this.isRunning = false;
+        this.animationFrameId = null; // Store animation frame ID for cancellation
         this.customCallback = null;
 
         console.log("GameLoop initialized.");
@@ -23,13 +24,18 @@ class GameLoop {
         if (this.isRunning) return;
         this.isRunning = true;
         this.lastTime = performance.now(); // 초기 시간 설정
-        requestAnimationFrame(this.loop.bind(this));
+        this.animationFrameId = requestAnimationFrame(this.loop.bind(this));
         console.log("GameLoop started.");
     }
 
     // 게임 루프 정지
     stop() {
+        if (!this.isRunning) return;
         this.isRunning = false;
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
         console.log("GameLoop stopped.");
     }
 
@@ -58,6 +64,6 @@ class GameLoop {
         }
 
         // 다음 프레임 요청
-        requestAnimationFrame(this.loop.bind(this));
+        this.animationFrameId = requestAnimationFrame(this.loop.bind(this));
     }
 }
