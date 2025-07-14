@@ -74,10 +74,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const battleGridManager = new BattleGridManager(gridEngine, cameraEngine, measurementEngine, resolutionEngine);
     const mercenaryPanelGridManager = new MercenaryPanelGridManager(gridEngine, panelEngine, measurementEngine);
 
+    // ✨ 새로운 엔진들 초기화
+    const sceneEngine = new SceneEngine(renderer, uiEngine, panelEngine, battleLogEngine, cameraEngine);
+    const territoryEngine = new TerritoryEngine(gameEngine, sceneEngine, uiEngine, battleLogEngine, measurementEngine);
+
+    // ✨ 인풋 트래킹 디버그 매니저 초기화
+    const inputTrackingDebugManager = new InputTrackingDebugManager(inputManager, debugManager);
+
     // 전역 노출 (개발 편의용)
     window.battleStageManagerInstance = battleStageManager;
     window.battleGridManagerInstance = battleGridManager;
     window.mercenaryPanelGridManagerInstance = mercenaryPanelGridManager;
+    window.sceneEngineInstance = sceneEngine; // 씬 엔진 전역 노출
+    window.territoryEngineInstance = territoryEngine; // 영지 엔진 전역 노출
+    window.inputTrackingDebugManagerInstance = inputTrackingDebugManager; // 인풋 트래킹 디버그 매니저 전역 노출
 
     // 9. 게임 루프 초기화
     const gameLoop = new GameLoop(gameEngine, renderer, panelEngine, uiEngine, delayEngine);
@@ -150,32 +160,37 @@ document.addEventListener('DOMContentLoaded', () => {
             gameLoop.start();
             battleStageManager.onAssetsLoaded();
 
-            // ✨ 이곳의 panelEngine.registerPanel 호출은 이제 불필요합니다.
-            // 위에서 이미 등록했습니다.
-            /*
-            panelEngine.registerPanel('mercenaryPanelCanvas', {
-                width: measurementEngine.internalResolution.width,
-                height: 100,
-                x: 0, y: 0
-            }, true);
-            panelEngine.registerPanel('combatLogCanvas', {
-                width: measurementEngine.internalResolution.width,
-                height: 150,
-                x: 0, y: measurementEngine.internalResolution.height - 150
-            }, false);
-            */
-
-            uiEngine.registerUIElement('startButton', 'button', {
-                x: measurementEngine.internalResolution.width / 2 - 100,
-                y: measurementEngine.internalResolution.height / 2 - 30,
-                width: 200, height: 60,
-                text: '게임 시작',
-                fontSize: measurementEngine.getFontSizeLarge(),
-                color: '#00FF00'
-            }, () => {
-                console.log('Start Button Clicked!');
-                battleLogEngine.addLog('게임이 시작되었습니다!', 'cyan');
+            // ✨ 씬 등록: 'territory' 씬과 'battle' 씬 정의
+            sceneEngine.registerScene('territory', {
+                activate: () => territoryEngine.activate(),
+                deactivate: () => territoryEngine.deactivate(),
+                update: (dt) => territoryEngine.update(dt),
+                draw: (renderer) => territoryEngine.draw(renderer)
             });
+
+            sceneEngine.registerScene('battle', {
+                activate: () => {
+                    console.log("SceneEngine: Activating Battle Scene.");
+                    battleLogEngine.addLog("전투 씬에 진입했습니다.", "red");
+                    battleStageManager.onAssetsLoaded();
+                    uiEngine.unregisterUIElement('startButton');
+                },
+                deactivate: () => {
+                    console.log("SceneEngine: Deactivating Battle Scene.");
+                },
+                update: (dt) => {
+                    battleGridManager.update(dt);
+                },
+                draw: (renderer) => {
+                    renderer.setClearColor(0.0, 0.0, 0.0, 1.0);
+                    renderer.clear();
+                    battleStageManager.draw(renderer);
+                    battleGridManager.draw(renderer);
+                }
+            });
+
+            // ✨ 게임 시작 시 'territory' 씬 로드
+            sceneEngine.loadScene('territory');
 
             delayEngine.addDelay(() => {
                 console.log('5초 후 메시지: 딜레이 엔진 작동 완료!');
@@ -194,16 +209,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (debugManager.isEnabled) {
             debugManager.update(deltaTime, totalGameTime, inputManager);
         }
+        inputTrackingDebugManager.update(deltaTime);
 
         panelEngine.update(deltaTime);
         uiEngine.update(deltaTime);
         delayEngine.update(deltaTime);
+
+        sceneEngine.update(deltaTime);
+        sceneEngine.draw(renderer);
     }
+
+    // ✨ 게임 루프의 requestAnimationFrame 콜백을 mainGameLoopTick으로 변경
+    gameLoop.setGameLoopCallback(mainGameLoopTick);
 
     window.addEventListener('keydown', (event) => {
         if (event.key === 'F12' && debugManager.isEnabled !== undefined) {
             event.preventDefault();
             debugManager.toggleEnabled();
+        }
+        // ✨ F11 키로 InputTrackingDebugManager 토글
+        if (event.key === 'F11') {
+            event.preventDefault();
+            inputTrackingDebugManager.toggleEnabled();
         }
     });
 
