@@ -14,14 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const combatLogCanvas = document.getElementById('combatLogCanvas');
     const combatLogGl = combatLogCanvas ?
-        combatLogCanvas.getContext('webgl', { alpha: true, antialias: true }) : null;
+        combatLogCanvas.getContext('2d', { alpha: true }) : null; // WebGL이 아닌 2D 컨텍스트로 변경
 
     if (!gl) {
         console.error("Failed to get main WebGL context. Game cannot run.");
         return;
     }
     if (!mercenaryPanelGl) { console.warn("Failed to get mercenary panel WebGL context."); }
-    if (!combatLogGl) { console.warn("Failed to get combat log WebGL context."); }
+    // combatLogCanvas는 2D 컨텍스트를 사용하므로 WebGL 경고는 필요 없습니다.
 
     // 2. 측량 엔진 초기화
     const measurementEngine = new MeasurementEngine(resolutionEngine);
@@ -50,6 +50,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mercenaryPanelGl) renderer.addPanelContext('mercenaryPanelCanvas', mercenaryPanelGl, mercenaryPanelCanvas);
     if (combatLogGl) renderer.addPanelContext('combatLogCanvas', combatLogGl, combatLogCanvas);
     panelEngine.renderer = renderer;
+
+    // ✨ 패널 등록을 MercenaryPanelGridManager 초기화보다 먼저 수행
+    // assetLoader.load가 완료될 때까지 기다릴 필요 없이 즉시 등록합니다.
+    panelEngine.registerPanel('mercenaryPanelCanvas', {
+        width: measurementEngine.internalResolution.width,
+        height: 100,
+        x: 0, y: 0
+    }, true);
+    panelEngine.registerPanel('combatLogCanvas', {
+        width: measurementEngine.internalResolution.width,
+        height: 150,
+        x: 0, y: measurementEngine.internalResolution.height - 150
+    }, false);
 
     // 7. 디버그 매니저 초기화
     const debugManager = new DebugManager('gameCanvas', true);
@@ -137,6 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
             gameLoop.start();
             battleStageManager.onAssetsLoaded();
 
+            // ✨ 이곳의 panelEngine.registerPanel 호출은 이제 불필요합니다.
+            // 위에서 이미 등록했습니다.
+            /*
             panelEngine.registerPanel('mercenaryPanelCanvas', {
                 width: measurementEngine.internalResolution.width,
                 height: 100,
@@ -147,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 height: 150,
                 x: 0, y: measurementEngine.internalResolution.height - 150
             }, false);
+            */
 
             uiEngine.registerUIElement('startButton', 'button', {
                 x: measurementEngine.internalResolution.width / 2 - 100,
