@@ -45,4 +45,5 @@ export class RenderEngine {
 
     getAnimationManager() { return this.animationManager; }
     getLayerEngine() { return this.layerEngine; }
+    getUIEngine() { return this.uiEngine; }
 }
