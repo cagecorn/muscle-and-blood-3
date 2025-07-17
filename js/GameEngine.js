@@ -109,4 +109,8 @@ export class GameEngine {
     getRenderEngine() { return this.renderEngine; }
     getBattleEngine() { return this.battleEngine; }
     getUnitStatManager() { return this.unitStatManager; }
+
+    getUIEngine() {
+        return this.renderEngine.getUIEngine();
+    }
 }
