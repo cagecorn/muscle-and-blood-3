@@ -98,6 +98,8 @@ export class BattleSimulatorEngine {
 
         // ✨ AspirationEngine에 battleSimulator 참조 설정
         aspirationEngine.setBattleSimulator(this);
+        // ✨ CombatCalculationEngine에 battleSimulator 참조 설정
+        combatCalculationEngine.setBattleSimulator(this);
 
         this.turnQueue = [];
         this.currentTurnIndex = 0;
@@ -149,7 +151,7 @@ export class BattleSimulatorEngine {
         sharedResourceEngine.initialize('ally');
         sharedResourceEngine.initialize('enemy');
         statusEffectManager.setBattleSimulator(this);
-        combatCalculationEngine.battleSimulator = this;
+        combatCalculationEngine.setBattleSimulator(this);
         // ✨ 전투 시작 시 음양 엔진을 초기화합니다.
         yinYangEngine.initializeUnits([...allies, ...enemies]);
 
@@ -420,7 +422,7 @@ export const battleSimulatorEngine = {
         // 컴뱃 계산 엔진과 상태 효과 매니저가 참조할 전투 컨텍스트
         const battleContext = { turnQueue: allUnits };
         statusEffectManager.setBattleSimulator(battleContext);
-        combatCalculationEngine.battleSimulator = battleContext;
+        combatCalculationEngine.setBattleSimulator(battleContext);
 
         const basicAttack = {
             id: 'basicAttack',
