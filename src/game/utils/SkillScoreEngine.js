@@ -55,6 +55,9 @@ class SkillScoreEngine {
             }
         ];
 
+        // 현재 조건의 스킬 점수를 캐시하여 재계산을 제한합니다.
+        this._cache = new Map();
+
         debugLogEngine.register(this);
     }
 
@@ -69,6 +72,12 @@ class SkillScoreEngine {
     async calculateScore(unit, skillData, target, allies, enemies) {
         if (!skillData || skillData.type === 'PASSIVE') {
             return 0;
+        }
+
+        const cacheKey = this._createCacheKey(unit, skillData, target);
+        if (this._cache.has(cacheKey)) {
+            // 이미 계산된 결과를 반환하며 추가 로그를 생략합니다.
+            return this._cache.get(cacheKey);
         }
 
         // 가독성을 위해 계산 항목을 구분해 기록합니다.
@@ -356,7 +365,18 @@ class SkillScoreEngine {
                 (situationLogs.length > 0 ? ` (${situationLogs.join(', ')})` : '')
         );
 
+        this._cache.set(cacheKey, finalScore);
         return finalScore;
+    }
+
+    // 스킬, 대상, 유닛의 현재 상태를 기반으로 캐시 키를 생성합니다.
+    _createCacheKey(unit, skill, target) {
+        const unitId = unit?.uniqueId ?? unit?.id ?? unit?.instanceName;
+        const targetId = target?.uniqueId ?? target?.id ?? 'none';
+        const unitHp = unit?.currentHp ?? 0;
+        const targetHp = target?.currentHp ?? 'none';
+        const skillId = skill?.id ?? skill?.name;
+        return `${unitId}:${unitHp}:${targetId}:${targetHp}:${skillId}`;
     }
 
     // ✨ MBTI 문자열을 가져오는 헬퍼 함수를 추가합니다.
