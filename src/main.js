@@ -1,5 +1,6 @@
 import StartGame from './game/main.js';
 import { archetypeMemoryEngine } from './game/utils/ArchetypeMemoryEngine.js';
+import './ai/patches/registerMBTISituationScorer.js';
 
 // [6차 강화학습 데이터] - 2025-08-10 로그 기반
 const learnedData_v6 = {
