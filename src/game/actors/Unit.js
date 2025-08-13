@@ -1,5 +1,3 @@
-import { GameObjects } from "phaser";
-
 export class Unit {
   constructor(scene, gridX, gridY, data, faction) {
     this.scene = scene;
