@@ -211,6 +211,25 @@ class AIManager {
     }
 
     /**
+     * 주어진 유닛의 행동을 미리 계획하여 반환합니다.
+     * @param {object} unit - 행동을 계획할 유닛
+     * @param {Array<object>} allUnits - 전장의 모든 유닛 목록
+     * @returns {{action: Function, initiative: number}}
+     */
+    planAction(unit, allUnits) {
+        const data = this.unitData.get(unit.uniqueId);
+        if (!data) {
+            return {
+                action: async () => {},
+                initiative: unit.finalStats?.turnValue ?? 0
+            };
+        }
+
+        const enemies = allUnits.filter(u => u.team !== unit.team && u.currentHp > 0);
+        return data.behaviorTree.planAction(unit, allUnits, enemies);
+    }
+
+    /**
      * 특정 유닛의 턴을 실행합니다.
      * @param {object} unit - 턴을 실행할 유닛
      * @param {Array<object>} allUnits - 전장의 모든 유닛

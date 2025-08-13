@@ -35,6 +35,26 @@ class BehaviorTree {
         this.blackboard.set('lastEvaluationState', result);
         return result;
     }
+
+    /**
+     * 사전에 행동을 계획하여 이니셔티브와 함께 반환합니다.
+     * 실제 게임 상태를 변경하지 않으며, 반환된 action 함수가 실행될 때만
+     * 행동 트리가 동작합니다.
+     * @param {object} unit - 계획을 세울 유닛
+     * @param {Array<object>} allUnits - 전장에 있는 모든 유닛 목록
+     * @param {Array<object>} enemyUnits - 적 유닛 목록
+     * @returns {{action: Function, initiative: number}}
+     */
+    planAction(unit, allUnits, enemyUnits) {
+        const initiative = unit.finalStats?.turnValue ?? 0;
+
+        // action은 나중에 실행 단계에서 호출될 함수입니다.
+        const action = async () => {
+            await this.execute(unit, allUnits, enemyUnits);
+        };
+
+        return { action, initiative };
+    }
 }
 
 export default BehaviorTree;

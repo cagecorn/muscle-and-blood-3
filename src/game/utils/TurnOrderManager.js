@@ -61,13 +61,18 @@ class TurnOrderManager {
      * 정렬된 액션 큐를 순서대로 실행합니다.
      * 실제 행동 적용 로직은 추후 구현됩니다.
      */
-    resolve() {
-        this.actionQueue.forEach(entry => {
+    async resolve() {
+        for (const entry of this.actionQueue) {
             const unit = this.getUnit(entry.unitId);
             const name = unit?.instanceName ?? 'Unknown';
-            debugLogEngine.log('TurnOrderManager', `${name}가 '${entry.action}'를 실행합니다.`);
-            // TODO: 실제 액션 처리 로직
-        });
+
+            if (typeof entry.action === 'function') {
+                debugLogEngine.log('TurnOrderManager', `${name}가 계획된 행동을 실행합니다.`);
+                await entry.action();
+            } else {
+                debugLogEngine.log('TurnOrderManager', `${name}가 '${entry.action}'를 실행합니다.`);
+            }
+        }
         this.actionQueue = [];
     }
 

@@ -194,7 +194,7 @@ export class BattleSimulatorEngine {
         });
 
         this.turnQueue = allUnits;
-        turnOrderManager.collectActions(allUnits);
+        turnOrderManager.collectActions(allUnits, u => aiManager.planAction(u, allUnits));
         this.actionQueue = turnOrderManager.createTurnQueue();
         this.currentActionIndex = 0;
         this.currentTurnNumber = 1; // 턴 번호 초기화
@@ -302,11 +302,9 @@ export class BattleSimulatorEngine {
                     this.scene.cameraControl.panTo(currentUnit.sprite.x, currentUnit.sprite.y);
                     await delayEngine.hold(500);
 
-                    if (aiManager.unitData.has(currentUnit.uniqueId)) {
-                        const allies = this.turnQueue.filter(u => u.team === 'ally' && u.currentHp > 0);
-                        const enemies = this.turnQueue.filter(u => u.team === 'enemy' && u.currentHp > 0);
-
-                        await aiManager.executeTurn(currentUnit, [...allies, ...enemies], currentUnit.team === 'ally' ? enemies : allies);
+                    const currentActionEntry = this.actionQueue[this.currentActionIndex];
+                    if (currentActionEntry && typeof currentActionEntry.action === 'function') {
+                        await currentActionEntry.action();
                     }
                 } else {
                     console.log(`%c[Battle] ${currentUnit.instanceName}은(는) 기절해서 움직일 수 없습니다!`, "color: yellow;");
@@ -338,7 +336,7 @@ export class BattleSimulatorEngine {
                 skillEngine.resetTurnActions();
 
                 const aliveUnits = this.turnQueue.filter(u => u.currentHp > 0);
-                turnOrderManager.collectActions(aliveUnits);
+                turnOrderManager.collectActions(aliveUnits, u => aiManager.planAction(u, aliveUnits));
                 this.actionQueue = turnOrderManager.createTurnQueue();
             }
 
@@ -463,7 +461,7 @@ export const battleSimulatorEngine = {
             debugLogEngine.log('System', `======= Turn ${turn} =======`);
 
             battleContext.turnQueue = [...simAllies, ...simEnemies];
-            turnOrderManager.collectActions(battleContext.turnQueue);
+            turnOrderManager.collectActions(battleContext.turnQueue, u => aiManager.planAction(u, battleContext.turnQueue));
             const turnOrder = turnOrderManager.createTurnQueue().map(a => turnOrderManager.getUnit(a.unitId));
 
             for (const unit of turnOrder) {
