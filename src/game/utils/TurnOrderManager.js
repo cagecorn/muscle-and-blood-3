@@ -7,6 +7,7 @@ class TurnOrderManager {
     constructor() {
         this.actionQueue = [];
         this.unitRegistry = new Map();
+        this.gaugeFilledListeners = new Set();
         debugLogEngine.log('TurnOrderManager', '턴 순서 매니저가 초기화되었습니다.');
     }
 
@@ -116,6 +117,16 @@ class TurnOrderManager {
      */
     getUnit(id) {
         return this.unitRegistry.get(id);
+    }
+
+    onGaugeFilled(listener) {
+        if (typeof listener === 'function') {
+            this.gaugeFilledListeners.add(listener);
+        }
+    }
+
+    emitGaugeFilled(unit) {
+        this.gaugeFilledListeners.forEach(cb => cb(unit));
     }
 }
 
