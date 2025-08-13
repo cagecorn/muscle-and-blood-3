@@ -23,13 +23,15 @@ class TurnOrderManager {
 
         units.forEach(unit => {
             this.unitRegistry.set(unit.uniqueId, unit);
-            const result = resolver(unit);
-            if (result && result.action !== undefined) {
-                this.actionQueue.push({
-                    unitId: unit.uniqueId,
-                    action: result.action,
-                    initiative: result.initiative ?? 0
-                });
+            if (unit.finalStats?.initiativeGauge >= 100) {
+                const result = resolver(unit);
+                if (result && result.action !== undefined) {
+                    this.actionQueue.push({
+                        unitId: unit.uniqueId,
+                        action: result.action,
+                        initiative: result.initiative ?? 0
+                    });
+                }
             }
         });
 
@@ -74,6 +76,7 @@ class TurnOrderManager {
             }
         }
         this.actionQueue = [];
+        this.unitRegistry.clear();
     }
 
     /**

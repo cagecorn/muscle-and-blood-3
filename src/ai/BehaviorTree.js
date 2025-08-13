@@ -46,7 +46,7 @@ class BehaviorTree {
      * @returns {{action: Function, initiative: number}}
      */
     planAction(unit, allUnits, enemyUnits) {
-        const initiative = unit.finalStats?.turnValue ?? 0;
+        const initiative = unit.finalStats?.speed ?? 0;
 
         // action은 나중에 실행 단계에서 호출될 함수입니다.
         const action = async () => {
