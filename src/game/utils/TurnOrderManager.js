@@ -1,4 +1,5 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+import { initiativeGaugeEngine } from './InitiativeGaugeEngine.js';
 
 /**
  * 유닛의 행동을 수집하고 이니셔티브에 따라 처리 순서를 정하는 매니저
@@ -7,6 +8,7 @@ class TurnOrderManager {
     constructor() {
         this.actionQueue = [];
         this.unitRegistry = new Map();
+        this.onGaugeFilled = null;
         debugLogEngine.log('TurnOrderManager', '턴 순서 매니저가 초기화되었습니다.');
     }
 
@@ -23,6 +25,17 @@ class TurnOrderManager {
 
         units.forEach(unit => {
             this.unitRegistry.set(unit.uniqueId, unit);
+            initiativeGaugeEngine.registerUnit(unit);
+
+            const gauge = unit.finalStats?.initiativeGauge ?? 0;
+            if (gauge < 100) {
+                return;
+            }
+
+            if (typeof this.onGaugeFilled === 'function') {
+                this.onGaugeFilled(unit);
+            }
+
             const result = resolver(unit);
             if (result && result.action !== undefined) {
                 this.actionQueue.push({
@@ -72,6 +85,8 @@ class TurnOrderManager {
             } else {
                 debugLogEngine.log('TurnOrderManager', `${name}가 '${entry.action}'를 실행합니다.`);
             }
+
+            initiativeGaugeEngine.resetGauge(entry.unitId);
         }
         this.actionQueue = [];
     }
