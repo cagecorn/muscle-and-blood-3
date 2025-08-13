@@ -1,4 +1,5 @@
 import { turnOrderManager } from '../utils/TurnOrderManager.js';
+import { tokenEngine } from '../utils/TokenEngine.js';
 
 /**
  * 전투 중 턴 순서 UI를 관리하는 DOM 매니저
@@ -11,6 +12,12 @@ export class TurnOrderUIManager {
             this.container.id = 'turn-order-container';
             document.getElementById('ui-container').appendChild(this.container);
         }
+
+        // 실제 항목을 담을 리스트를 미리 만들어둔다.
+        this.listElem = document.createElement('div');
+        this.listElem.className = 'turn-order-list';
+        this.container.appendChild(this.listElem);
+
         this.container.style.display = 'none';
     }
 
@@ -19,7 +26,6 @@ export class TurnOrderUIManager {
      * @param {Array<object>} initialQueue - 최초 액션 큐
      */
     show(initialQueue) {
-        this.container.innerHTML = '';
         this.update(initialQueue);
         this.container.style.display = 'block';
     }
@@ -36,7 +42,7 @@ export class TurnOrderUIManager {
      * @param {Array<object>} newQueue - 갱신된 액션 큐
      */
     update(newQueue) {
-        this.container.innerHTML = '';
+        this.listElem.innerHTML = '';
 
         newQueue.forEach(entry => {
             const unit = entry.unitId ? turnOrderManager.getUnit(entry.unitId) : entry;
@@ -44,9 +50,6 @@ export class TurnOrderUIManager {
 
             const unitEntry = document.createElement('div');
             unitEntry.className = 'turn-order-entry';
-            if (unit.isTurnActive) {
-                unitEntry.classList.add('active-turn');
-            }
 
             const portrait = document.createElement('div');
             portrait.className = 'turn-order-portrait';
@@ -57,9 +60,25 @@ export class TurnOrderUIManager {
             nameLabel.className = 'turn-order-name';
             nameLabel.innerText = unit.instanceName;
 
+            const actionLabel = document.createElement('span');
+            actionLabel.className = 'turn-order-action';
+            actionLabel.innerText = entry.action || '대기';
+
+            const tokenContainer = document.createElement('div');
+            tokenContainer.className = 'turn-order-token-container';
+            const tokens = tokenEngine.getTokens(unit.uniqueId);
+            for (let i = 0; i < tokens; i++) {
+                const tokenImg = document.createElement('img');
+                tokenImg.src = 'assets/images/battle/token.png';
+                tokenImg.className = 'turn-order-token-icon';
+                tokenContainer.appendChild(tokenImg);
+            }
+
             unitEntry.appendChild(portrait);
             unitEntry.appendChild(nameLabel);
-            this.container.appendChild(unitEntry);
+            unitEntry.appendChild(actionLabel);
+            unitEntry.appendChild(tokenContainer);
+            this.listElem.appendChild(unitEntry);
         });
     }
 

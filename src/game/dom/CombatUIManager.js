@@ -28,6 +28,7 @@ export class CombatUIManager {
         this.battleSpeedManager = battleSpeedManager;
         this.currentUnitId = null; // 현재 표시 중인 유닛 ID
         this.skillIcons = [];      // 스킬 아이콘 요소들을 저장할 배열
+        this.onConfirmPlanning = null; // 계획 확정 콜백
 
         // UI 구조를 미리 생성합니다.
         this._createBaseLayout();
@@ -105,11 +106,22 @@ export class CombatUIManager {
             this.speedButton.innerText = `${newSpeed}x`;
         };
 
+        this.confirmButton = document.createElement('button');
+        this.confirmButton.id = 'confirm-actions-btn';
+        this.confirmButton.textContent = '행동 확정';
+        this.confirmButton.className = 'battle-control-button';
+        this.confirmButton.onclick = () => {
+            if (this.onConfirmPlanning) this.onConfirmPlanning();
+        };
+        this.confirmButton.style.display = 'none';
+
         this.instantResultButton = document.createElement('button');
         this.instantResultButton.id = 'instant-result-btn';
         this.instantResultButton.textContent = '전투 종료 결과';
         this.instantResultButton.className = 'battle-control-button';
+
         controlsContainer.appendChild(this.speedButton);
+        controlsContainer.appendChild(this.confirmButton);
         controlsContainer.appendChild(this.instantResultButton);
 
         const rightPanel = document.createElement('div');
@@ -119,6 +131,24 @@ export class CombatUIManager {
 
         this.container.appendChild(infoPanel);
         this.container.appendChild(rightPanel);
+    }
+
+    /**
+     * 계획 확정 버튼 표시 여부를 토글합니다.
+     * @param {boolean} show
+     */
+    toggleConfirmButton(show) {
+        if (this.confirmButton) {
+            this.confirmButton.style.display = show ? 'inline-block' : 'none';
+        }
+    }
+
+    /**
+     * 계획 확정 버튼 클릭 시 호출될 핸들러를 등록합니다.
+     * @param {Function} handler
+     */
+    setConfirmPlanningHandler(handler) {
+        this.onConfirmPlanning = handler;
     }
 
     _setupInstantResultButton() {
