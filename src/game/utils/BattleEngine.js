@@ -34,6 +34,7 @@ class BattleEngine {
 
     /**
      * 매 프레임 호출되어 전투를 진행한다.
+     * initiativeGaugeEngine을 활용해 행동 준비가 된 유닛들의 차례를 동시에 처리한다.
      * @param {number} [deltaMs]
      */
     async update(deltaMs) {

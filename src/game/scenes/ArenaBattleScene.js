@@ -5,6 +5,7 @@ import { partyEngine } from '../utils/PartyEngine.js';
 import { BattleSimulatorEngine } from '../utils/BattleSimulatorEngine.js';
 import { arenaManager } from '../utils/ArenaManager.js';
 import { logDownloader } from '../utils/LogDownloader.js'; // logDownloader import 추가
+import { battleEngine } from '../utils/BattleEngine.js'; // battleEngine import 추가
 
 export class ArenaBattleScene extends Scene {
     constructor() {
@@ -35,7 +36,8 @@ export class ArenaBattleScene extends Scene {
         const partyUnits = partyEngine.getDeployedMercenaries();
         const enemyUnits = arenaManager.getEnemyTeam();
 
-        this.battleSimulator.start(partyUnits, enemyUnits);
+        // battleSimulator.start 대신 battleEngine.startBattle을 사용
+        battleEngine.startBattle(partyUnits, enemyUnits);
 
         // ✨ 'L' 키를 누르면 로그를 다운로드하는 이벤트 리스너를 추가합니다.
         this.input.keyboard.on('keydown-L', () => {
@@ -50,5 +52,9 @@ export class ArenaBattleScene extends Scene {
             if (this.cameraControl) this.cameraControl.destroy();
             if (this.battleSimulator) this.battleSimulator.shutdown();
         });
+    }
+
+    update(time, delta) {
+        battleEngine.update(delta);
     }
 }
