@@ -20,6 +20,7 @@ class TokenEngine {
         units.forEach(unit => {
             this.tokenData.set(unit.uniqueId, {
                 currentTokens: 0,
+                pendingTokens: 0,
                 unitName: unit.instanceName
             });
         });
@@ -36,6 +37,7 @@ class TokenEngine {
         if (!this.tokenData.has(unit.uniqueId)) {
             this.tokenData.set(unit.uniqueId, {
                 currentTokens: 3,
+                pendingTokens: 3,
                 unitName: unit.instanceName
             });
             // 로그를 통해 토큰 지급 내역을 기록합니다.
@@ -56,6 +58,7 @@ class TokenEngine {
             const actualAmount = newTotal - data.currentTokens;
             if (actualAmount > 0) {
                 data.currentTokens = newTotal;
+                data.pendingTokens = Math.min(this.maxTokens, data.pendingTokens + actualAmount);
                 debugTokenManager.logTokenChange(unitId, data.unitName, reason, actualAmount, data.currentTokens);
             }
         }
@@ -71,6 +74,7 @@ class TokenEngine {
             const changeAmount = newTotal - data.currentTokens;
 
             data.currentTokens = newTotal;
+            data.pendingTokens = newTotal;
 
             if (changeAmount !== 0) {
                 debugTokenManager.logTokenChange(unitId, data.unitName, '턴 시작', changeAmount, data.currentTokens);
@@ -86,13 +90,31 @@ class TokenEngine {
      */
     spendTokens(unitId, amount) {
         const data = this.tokenData.get(unitId);
-        if (data && data.currentTokens >= amount) {
-            data.currentTokens -= amount;
-            debugTokenManager.logTokenChange(unitId, data.unitName, '스킬 사용', -amount, data.currentTokens);
+        if (data && data.pendingTokens >= amount) {
+            data.pendingTokens -= amount;
+            debugTokenManager.logTokenChange(unitId, data.unitName, '스킬 사용 계획', -amount, data.pendingTokens);
             return true;
         }
-        debugLogEngine.warn('TokenEngine', `유닛(ID:${unitId}) 토큰 부족으로 ${amount}개 사용 실패.`);
+        debugLogEngine.warn('TokenEngine', `유닛(ID:${unitId}) 토큰 부족으로 ${amount}개 사용 계획 실패.`);
         return false;
+    }
+
+    /**
+     * 계획된 토큰 변동을 확정합니다. 실패 시 롤백합니다.
+     * @param {number} unitId - 유닛의 고유 ID
+     * @param {boolean} success - true면 계획 확정, false면 롤백
+     */
+    finalizeTokens(unitId, success) {
+        const data = this.tokenData.get(unitId);
+        if (!data) return;
+
+        if (success) {
+            data.currentTokens = data.pendingTokens;
+            debugLogEngine.log('TokenEngine', `유닛(ID:${unitId}) 토큰 계획 확정: ${data.currentTokens}`);
+        } else {
+            data.pendingTokens = data.currentTokens;
+            debugLogEngine.log('TokenEngine', `유닛(ID:${unitId}) 토큰 계획 롤백`);
+        }
     }
 
     /**
@@ -102,6 +124,15 @@ class TokenEngine {
      */
     getTokens(unitId) {
         return this.tokenData.get(unitId)?.currentTokens || 0;
+    }
+
+    /**
+     * 토큰 사용 계획 이후의 예상 토큰 개수를 반환합니다.
+     * @param {number} unitId - 조회할 유닛의 고유 ID
+     * @returns {number} - 계획 단계의 토큰 개수
+     */
+    getPendingTokens(unitId) {
+        return this.tokenData.get(unitId)?.pendingTokens || 0;
     }
 }
 
