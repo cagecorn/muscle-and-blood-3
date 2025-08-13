@@ -28,12 +28,19 @@ export async function findBestActionForUnit(unit, allies = [], enemies = [], use
         const virtualUnit = { ...unit, gridX: movePos.col, gridY: movePos.row };
         const moveCost = Math.abs(unit.gridX - movePos.col) + Math.abs(unit.gridY - movePos.row);
 
+        // 먼저 사용 가능한 스킬만 선별합니다.
+        const availableSkills = [];
         for (const instanceId of equippedSkillInstances) {
             if (!instanceId || usedSkills.has(instanceId)) continue;
             const instData = skillInventoryManager.getInstanceData(instanceId);
             const skillData = skillInventoryManager.getSkillData(instData.skillId, instData.grade);
-            if (!skillEngine.canUseSkill(virtualUnit, skillData)) continue;
+            if (skillEngine.canUseSkill(virtualUnit, skillData)) {
+                availableSkills.push({ skillData, instanceId });
+            }
+        }
+        if (availableSkills.length === 0) continue;
 
+        for (const { skillData, instanceId } of availableSkills) {
             const isSelfTarget = skillData.targetType === 'self';
             const candidates = isSelfTarget
                 ? [virtualUnit]

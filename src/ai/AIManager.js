@@ -2,6 +2,7 @@ import { debugLogEngine } from '../game/utils/DebugLogEngine.js';
 import { tokenEngine } from '../game/utils/TokenEngine.js';
 import { skillEngine } from '../game/utils/SkillEngine.js';
 import { aspirationEngine } from '../game/utils/AspirationEngine.js';
+import { NodeState } from './nodes/Node.js';
 import { createMeleeAI } from './behaviors/MeleeAI.js';
 import { createRangedAI } from './behaviors/RangedAI.js';
 import { createHealerAI } from './behaviors/createHealerAI.js';
@@ -265,7 +266,11 @@ class AIManager {
             }
             // --- ▲ [핵심 수정] 혼란 상태 체크 및 타겟 교체 ▲ ---
 
-            await data.behaviorTree.execute(unit, allUnits, currentEnemies);
+            const treeResult = await data.behaviorTree.execute(unit, allUnits, currentEnemies);
+            if (treeResult === NodeState.FAILURE) {
+                debugLogEngine.log('AIManager', `[${unit.instanceName}] 행동 실패 - 루프 종료.`);
+                break;
+            }
 
             const currentTokens = tokenEngine.getTokens(unit.uniqueId);
             const currentSkillsUsedSize = (blackboard.get('usedSkillsThisTurn') || new Set()).size;

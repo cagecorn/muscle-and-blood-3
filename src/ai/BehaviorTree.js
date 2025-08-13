@@ -30,8 +30,10 @@ class BehaviorTree {
         this.blackboard.set('allyUnits', allyUnits);
         // --- ▲ [버그 수정] ▲ ---
 
-        // 루트 노드부터 평가를 시작합니다.
-        await this.root.evaluate(unit, this.blackboard);
+        // 루트 노드부터 평가를 시작하고 결과를 반환합니다.
+        const result = await this.root.evaluate(unit, this.blackboard);
+        this.blackboard.set('lastEvaluationState', result);
+        return result;
     }
 }
 
