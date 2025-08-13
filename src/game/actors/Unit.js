@@ -10,6 +10,7 @@ export class Unit {
     this.gridX = gridX;
     this.gridY = gridY;
     
+    // 기본 데이터와 병합
     const baseMercData = mercenaryData[unitData.id] || {};
     Object.assign(this, { ...baseMercData, ...unitData });
 
@@ -18,18 +19,22 @@ export class Unit {
     this.sprite = scene.add.sprite(0, 0, this.sprite);
     this.finalStats = statEngine.calculateStats(this, this.baseStats || unitData);
     this.currentHp = this.finalStats.hp;
-    this.currentAP = 0;
 
-    // --- 🔹 STEP 5 추가된 부분 🔹 ---
-    /** @type {any} 행동 계획을 저장하는 변수 (예: {type: 'attack', target: Unit}) */
-    this.plannedAction = null; 
+    // --- 🔹 STEP 3 추가된 부분 🔹 ---
+    this.currentAP = 0; // 행동력(Action Power) 변수 추가 및 초기화
     // ------------------------------------
   }
 
+  // --- 🔹 STEP 3 추가된 부분 🔹 ---
+  /**
+   * 유닛의 속도에 비례하여 행동력(AP)을 축적합니다.
+   * 이 값은 나중에 소수점 계산의 정확도를 위해 100으로 나눕니다.
+   */
   accumulateAP() {
     this.currentAP += this.finalStats.speed / 100;
   }
-  
+  // ------------------------------------
+
   move(gridX, gridY) {
     this.gridX = gridX;
     this.gridY = gridY;
