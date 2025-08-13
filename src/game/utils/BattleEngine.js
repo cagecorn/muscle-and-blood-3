@@ -1,5 +1,6 @@
 import { turnOrderManager } from './TurnOrderManager.js';
 import { aiManager } from '../../ai/AIManager.js';
+import { initiativeGaugeEngine } from './InitiativeGaugeEngine.js';
 
 /**
  * 전투 로직의 기반이 되는 엔진
@@ -16,38 +17,41 @@ class BattleEngine {
      * @param {Array<object>} enemies - 적군 유닛 목록
      */
     startBattle(allies, enemies) {
+        const allUnits = [...allies, ...enemies];
+
         this.currentBattle = {
             allies,
             enemies,
-            turn: 1,
-            phase: 'planning'
+            turn: 1
         };
 
-        // AI 유닛을 등록합니다.
         aiManager.clear();
-        [...allies, ...enemies].forEach(u => aiManager.registerUnit(u));
+        allUnits.forEach(u => aiManager.registerUnit(u));
+        initiativeGaugeEngine.registerUnits(allUnits);
 
         console.log('Battle started', this.currentBattle);
     }
 
     /**
-     * 매 턴 호출되어 전투를 진행한다.
-     * 상세 로직은 추후 구현한다.
+     * 매 프레임 호출되어 전투를 진행한다.
+     * @param {number} [deltaMs]
      */
-    async update() {
+    async update(deltaMs) {
         if (!this.currentBattle) return;
 
         const battle = this.currentBattle;
-        if (battle.phase === 'planning') {
-            const units = [...battle.allies, ...battle.enemies].filter(u => u.currentHp > 0);
-            turnOrderManager.collectActions(units, unit => aiManager.planAction(unit, units));
-            turnOrderManager.createTurnQueue();
-            battle.phase = 'resolution';
-        } else if (battle.phase === 'resolution') {
-            await turnOrderManager.resolve();
-            battle.turn += 1;
-            battle.phase = 'planning';
+        const allUnits = [...battle.allies, ...battle.enemies].filter(u => u.currentHp > 0);
+        const readyUnits = initiativeGaugeEngine.tick(allUnits);
+        if (readyUnits.length === 0) {
+            return;
         }
+
+        turnOrderManager.collectActions(readyUnits, unit => aiManager.planAction(unit, allUnits));
+        turnOrderManager.createTurnQueue();
+        await turnOrderManager.resolve(unitId => {
+            initiativeGaugeEngine.resetGauge(unitId);
+            battle.turn += 1;
+        });
     }
 
     /**
@@ -57,6 +61,7 @@ class BattleEngine {
         if (this.currentBattle) {
             console.log('Battle ended');
             this.currentBattle = null;
+            initiativeGaugeEngine.clear();
         }
     }
 }
