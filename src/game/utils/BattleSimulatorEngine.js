@@ -101,8 +101,10 @@ export class BattleSimulatorEngine {
         // ✨ CombatCalculationEngine에 battleSimulator 참조 설정
         combatCalculationEngine.setBattleSimulator(this);
 
+        // 전투에 참여하는 모든 유닛 목록과 액션 큐
         this.turnQueue = [];
-        this.currentTurnIndex = 0;
+        this.actionQueue = [];
+        this.currentActionIndex = 0;
         // --- ✨ 전체 턴 수를 추적하는 변수 ---
         this.currentTurnNumber = 1;
     }
@@ -191,12 +193,14 @@ export class BattleSimulatorEngine {
             }
         });
 
-        this.turnQueue = turnOrderManager.createTurnQueue(allUnits);
-        this.currentTurnIndex = 0;
+        this.turnQueue = allUnits;
+        turnOrderManager.collectActions(allUnits);
+        this.actionQueue = turnOrderManager.createTurnQueue();
+        this.currentActionIndex = 0;
         this.currentTurnNumber = 1; // 턴 번호 초기화
 
         // 턴 순서 UI 초기화
-        this.turnOrderUI.show(this.turnQueue);
+        this.turnOrderUI.show(this.actionQueue);
         this.sharedResourceUI.show();
         this.narrationUI.show('전투 시작!', 1500);
 
@@ -263,16 +267,19 @@ export class BattleSimulatorEngine {
     // gameLoop를 while 루프로 변경
     async gameLoop() {
         while (this.isRunning && !this.isBattleOver()) {
-            const currentUnit = this.turnQueue[this.currentTurnIndex];
+            const currentAction = this.actionQueue[this.currentActionIndex];
+            const currentUnit = currentAction ? turnOrderManager.getUnit(currentAction.unitId) : null;
 
             // ✨ AI가 현재 턴을 인식할 수 있도록 블랙보드에 기록
-            const aiData = aiManager.unitData.get(currentUnit.uniqueId);
+            const aiData = currentUnit ? aiManager.unitData.get(currentUnit.uniqueId) : null;
             if (aiData) {
                 aiData.behaviorTree.blackboard.set('currentTurnNumber', this.currentTurnNumber);
             }
 
             // 턴 시작 시 콤보 정보를 초기화합니다.
-            comboManager.startTurn(currentUnit.uniqueId);
+            if (currentUnit) {
+                comboManager.startTurn(currentUnit.uniqueId);
+            }
             
             // ✨ [신규] 턴 시작 시 동적 패시브 효과를 적용합니다.
             if (currentUnit && currentUnit.currentHp > 0) {
@@ -280,8 +287,11 @@ export class BattleSimulatorEngine {
             }
 
             // 현재 턴 표시를 위해 턴 순서 UI 업데이트
-            this.turnQueue.forEach((u, index) => u.isTurnActive = (index === this.currentTurnIndex));
-            this.turnOrderUI.update(this.turnQueue);
+            this.actionQueue.forEach((entry, index) => {
+                const unit = turnOrderManager.getUnit(entry.unitId);
+                if (unit) unit.isTurnActive = (index === this.currentActionIndex);
+            });
+            this.turnOrderUI.update(this.actionQueue);
 
             // 턴을 처리하기 전에 유닛이 살아있는지 확인하여 죽은 유닛의 턴을 건너뜁니다.
             if (currentUnit && currentUnit.currentHp > 0) {
@@ -315,10 +325,10 @@ export class BattleSimulatorEngine {
                 await delayEngine.hold(500); // 변경된 상태를 잠시 보여줍니다.
             }
 
-            this.currentTurnIndex++;
-            if (this.currentTurnIndex >= this.turnQueue.length) {
-                this.currentTurnIndex = 0;
-                this.currentTurnNumber++; // 모든 유닛의 턴이 끝나면 전체 턴 수 증가
+            this.currentActionIndex++;
+            if (this.currentActionIndex >= this.actionQueue.length) {
+                this.currentActionIndex = 0;
+                this.currentTurnNumber++; // 모든 유닛의 행동이 끝나면 전체 턴 수 증가
 
                 // ✨ [수정] 턴 종료 시 지속 피해 효과 처리를 statusEffectManager로 위임
                 statusEffectManager.onTurnEnd(this.turnQueue);
@@ -326,11 +336,18 @@ export class BattleSimulatorEngine {
                 yinYangEngine.applyTurnDecay();
                 tokenEngine.addTokensForNewTurn();
                 skillEngine.resetTurnActions();
+
+                const aliveUnits = this.turnQueue.filter(u => u.currentHp > 0);
+                turnOrderManager.collectActions(aliveUnits);
+                this.actionQueue = turnOrderManager.createTurnQueue();
             }
 
             // 다음 턴을 위해 턴 순서 UI 갱신
-            this.turnQueue.forEach((u, idx) => u.isTurnActive = (idx === this.currentTurnIndex));
-            this.turnOrderUI.update(this.turnQueue);
+            this.actionQueue.forEach((entry, idx) => {
+                const unit = turnOrderManager.getUnit(entry.unitId);
+                if (unit) unit.isTurnActive = (idx === this.currentActionIndex);
+            });
+            this.turnOrderUI.update(this.actionQueue);
 
             // --- ✨ 매 행동 후 모든 유닛의 UI를 갱신합니다. ---
             this.turnQueue.forEach(unit => {
@@ -346,7 +363,8 @@ export class BattleSimulatorEngine {
             this.sharedResourceUI.update();
 
             // 다음 턴의 유닛 정보를 미리 갱신합니다.
-            const nextUnit = this.turnQueue[this.currentTurnIndex];
+            const nextAction = this.actionQueue[this.currentActionIndex];
+            const nextUnit = nextAction ? turnOrderManager.getUnit(nextAction.unitId) : null;
             // 다음 턴의 유닛이 살아있을 때만 UI를 업데이트합니다.
             if (nextUnit && nextUnit.currentHp > 0) {
                 this.combatUI.show(nextUnit);
@@ -445,7 +463,8 @@ export const battleSimulatorEngine = {
             debugLogEngine.log('System', `======= Turn ${turn} =======`);
 
             battleContext.turnQueue = [...simAllies, ...simEnemies];
-            const turnOrder = turnOrderManager.createTurnQueue(battleContext.turnQueue);
+            turnOrderManager.collectActions(battleContext.turnQueue);
+            const turnOrder = turnOrderManager.createTurnQueue().map(a => turnOrderManager.getUnit(a.unitId));
 
             for (const unit of turnOrder) {
                 if (unit.currentHp <= 0) continue;
