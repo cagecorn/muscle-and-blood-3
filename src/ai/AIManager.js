@@ -221,7 +221,7 @@ class AIManager {
         if (!data) {
             return {
                 action: async () => {},
-                initiative: unit.finalStats?.turnValue ?? 0
+                initiative: unit.finalStats?.speed ?? 0
             };
         }
 
