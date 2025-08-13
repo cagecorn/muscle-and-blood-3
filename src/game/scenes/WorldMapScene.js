@@ -1,90 +1,45 @@
-// src/game/scenes/WorldMapScene.js
-
-import { Scene } from "phaser";
-import { Grid } from "../utils/Grid";
-import { Unit } from "../actors/Unit";
-import { units as unitData } from "../data/units";
+import { Scene } from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
+import { WorldMapEngine } from '../utils/WorldMapEngine.js';
+import { LeaderEngine } from '../utils/LeaderEngine.js';
+import { WorldMapTurnEngine } from '../utils/WorldMapTurnEngine.js';
+import { CameraControlEngine } from '../utils/CameraControlEngine.js';
 
 export class WorldMapScene extends Scene {
-  constructor() {
-    super("WorldMapScene");
-  }
+    constructor() {
+        super('WorldMapScene');
+    }
 
-  create() {
-    this.grid = new Grid(this, 30, 20, 50);
-    this.units = []; // 모든 유닛을 관리할 배열
+    create() {
+        // 다른 DOM 컨테이너 숨기기
+        const territoryContainer = document.getElementById('territory-container');
+        if (territoryContainer) {
+            territoryContainer.style.display = 'none';
+        }
 
-    // 아군 지휘관 생성
-    const player = new Unit(this, 5, 10, unitData.player, "player");
-    this.playerUnit = player; // 플레이어 유닛은 따로 관리하여 조작
-    this.units.push(player);
-    this.grid.add(player.sprite, 5, 10);
+        // 1. 월드맵 엔진을 생성하고 맵을 만듭니다.
+        const mapEngine = new WorldMapEngine(this);
+        mapEngine.create();
 
-    // 적군 지휘관 생성
-    const enemyCommander = new Unit(
-      this,
-      25,
-      10,
-      unitData.enemyCommander,
-      "enemy"
-    );
-    this.units.push(enemyCommander);
-    this.grid.add(enemyCommander.sprite, 25, 10);
+        // 2. 리더 엔진을 생성하고 플레이어 캐릭터를 만듭니다.
+        const leaderEngine = new LeaderEngine(this, mapEngine);
+        leaderEngine.create();
+        
+        // 3. 턴 엔진을 생성하여 키보드 입력을 처리합니다.
+        new WorldMapTurnEngine(this, leaderEngine);
 
-    // 용병 생성 (2명씩)
-    const alliedMerc1 = new Unit(
-      this,
-      5,
-      12,
-      unitData.alliedMercenary,
-      "player"
-    );
-    this.units.push(alliedMerc1);
-    this.grid.add(alliedMerc1.sprite, 5, 12);
+        // 4. 카메라 드래그 및 줌 기능을 활성화합니다.
+        new CameraControlEngine(this);
 
-    const alliedMerc2 = new Unit(
-      this,
-      7,
-      12,
-      unitData.alliedMercenary,
-      "player"
-    );
-    this.units.push(alliedMerc2);
-    this.grid.add(alliedMerc2.sprite, 7, 12);
-
-    const enemyMerc1 = new Unit(
-      this,
-      23,
-      12,
-      unitData.enemyMercenary,
-      "enemy"
-    );
-    this.units.push(enemyMerc1);
-    this.grid.add(enemyMerc1.sprite, 23, 12);
-
-    const enemyMerc2 = new Unit(
-      this,
-      25,
-      12,
-      unitData.enemyMercenary,
-      "enemy"
-    );
-    this.units.push(enemyMerc2);
-    this.grid.add(enemyMerc2.sprite, 25, 12);
-
-    // 플레이어 이동 로직
-    this.input.on("pointerdown", (pointer) => {
-      const { gridX, gridY } = this.grid.getGridPosition(pointer.x, pointer.y);
-      this.playerUnit.move(gridX, gridY);
-
-      // STEP 2에서 구현할 함수 호출 (지금은 빈 함수)
-      this.runWeGoTurn();
-    });
-  }
-
-  // STEP 2에서 구현할 We-go 턴 실행 함수
-  runWeGoTurn() {
-    console.log("We-go turn triggered! (아직 기능 없음)");
-    // 이 안에 행동력 기반의 전투 로직이 들어갈 예정입니다.
-  }
+        // 'T' 키를 누르면 영지 씬으로 돌아가는 기능을 추가합니다.
+        this.input.keyboard.on('keydown-T', () => {
+            this.scene.start('TerritoryScene');
+        });
+        
+        // 씬이 종료될 때 DOM 요소를 정리하도록 이벤트를 설정합니다.
+        this.events.on('shutdown', () => {
+            if (territoryContainer) {
+                territoryContainer.style.display = 'block';
+            }
+        });
+    }
 }
