@@ -19,6 +19,8 @@ export class TurnOrderUIManager {
         this.container.appendChild(this.listElem);
 
         this.container.style.display = 'none';
+
+        this.bindGaugeEvents();
     }
 
     /**
@@ -50,6 +52,7 @@ export class TurnOrderUIManager {
 
             const unitEntry = document.createElement('div');
             unitEntry.className = 'turn-order-entry';
+            unitEntry.dataset.unitId = unit.uniqueId;
 
             const portrait = document.createElement('div');
             portrait.className = 'turn-order-portrait';
@@ -74,11 +77,45 @@ export class TurnOrderUIManager {
                 tokenContainer.appendChild(tokenImg);
             }
 
+            const initiativeBar = document.createElement('div');
+            initiativeBar.className = 'initiative-bar';
             unitEntry.appendChild(portrait);
             unitEntry.appendChild(nameLabel);
             unitEntry.appendChild(actionLabel);
             unitEntry.appendChild(tokenContainer);
+            unitEntry.appendChild(initiativeBar);
             this.listElem.appendChild(unitEntry);
+        });
+
+        this.refreshGaugeBars();
+    }
+
+    bindGaugeEvents() {
+        const gaugeEngine = globalThis?.initiativeGaugeEngine;
+        if (gaugeEngine?.onGaugeChange) {
+            gaugeEngine.onGaugeChange(() => this.refreshGaugeBars());
+        } else if (typeof turnOrderManager.onGaugeFilled === 'function') {
+            turnOrderManager.onGaugeFilled(() => this.refreshGaugeBars());
+        }
+    }
+
+    refreshGaugeBars() {
+        const entries = this.listElem.querySelectorAll('.turn-order-entry');
+        entries.forEach(entry => {
+            const unit = turnOrderManager.getUnit(entry.dataset.unitId);
+            if (!unit) return;
+
+            const gauge = unit.finalStats?.initiativeGauge || 0;
+            const bar = entry.querySelector('.initiative-bar');
+            if (bar) {
+                bar.style.width = Math.min(100, gauge) + '%';
+                bar.textContent = (gauge / 100).toFixed(0);
+            }
+            if (gauge >= 100) {
+                entry.classList.add('ready');
+            } else {
+                entry.classList.remove('ready');
+            }
         });
     }
 
