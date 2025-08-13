@@ -1558,6 +1558,79 @@ export const activeSkills = {
             damageMultiplier: { min: 0.95, max: 1.05 }
             // 실제 처형 로직은 CombatCalculationEngine에서 처리됩니다.
         }
-    }
+    },
     // --- ▲ [신규] 엑시큐셔너 전용 '암살' 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 나노맨서 전용 스킬 4종 추가 ▼ ---
+    manaStrike: {
+        yinYangValue: -1,
+        NORMAL: {
+            id: 'manaStrike',
+            name: 'Mana Strike',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer'],
+            tags: [SKILL_TAGS.MELEE, SKILL_TAGS.MAGIC, 'ATTACK'],
+            cost: 2,
+            targetType: 'enemy',
+            description: 'Strike a nearby enemy with a mana-infused blade. Damage scales with both Strength and Intelligence.',
+            illustrationPath: null,
+            cooldown: 0,
+            range: 1,
+        },
+    },
+
+    arcaneCharge: {
+        yinYangValue: +2,
+        NORMAL: {
+            id: 'arcaneCharge',
+            name: 'Arcane Charge',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer'],
+            tags: [SKILL_TAGS.CHARGE, 'MOVEMENT', SKILL_TAGS.BUFF, 'SHIELD'],
+            cost: 3,
+            targetType: 'enemy',
+            description: 'Dash towards an enemy up to 3 tiles away. Upon arrival, gain a 10 point magic shield for 1 turn.',
+            illustrationPath: null,
+            cooldown: 2,
+            range: 3,
+            effect: { id: 'arcaneShield', duration: 1, shield: 10 },
+        },
+    },
+
+    forceUnleashed: {
+        yinYangValue: +4,
+        NORMAL: {
+            id: 'forceUnleashed',
+            name: 'Force Unleashed',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer'],
+            tags: ['FORCE', SKILL_TAGS.MAGIC, 'AOE', 'ATTACK'],
+            cost: 4,
+            targetType: 'self',
+            description: 'Emit a devastating shockwave of pure force, hitting all enemies within 2 tiles for heavy magic damage.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 0,
+            aoe: { shape: 'SQUARE', radius: 2 },
+        },
+    },
+
+    kineticBeam: {
+        yinYangValue: +3,
+        NORMAL: {
+            id: 'kineticBeam',
+            name: 'Kinetic Beam',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer'],
+            tags: ['BEAM', SKILL_TAGS.KINETIC, SKILL_TAGS.RANGED, 'ATTACK'],
+            cost: 3,
+            targetType: 'line',
+            description: 'Fire a concentrated beam of kinetic energy in a straight line, damaging and pushing back all enemies it passes through.',
+            illustrationPath: null,
+            cooldown: 2,
+            range: 4,
+            aoe: { shape: 'LINE', length: 4 },
+        },
+    },
+    // --- ▲ [신규] 나노맨서 전용 스킬 4종 추가 ▲ ---
 };

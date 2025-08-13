@@ -154,4 +154,21 @@ for (const base of frostweaverBases) {
     }
 }
 
+// 신규 나노맨서 스킬 검증
+const nanomancerBases = [
+    { id: 'manaStrike', cost: 2, cooldown: 0, tags: ['MELEE', 'MAGIC', 'ATTACK'] },
+    { id: 'arcaneCharge', cost: 3, cooldown: 2, tags: ['CHARGE', 'MOVEMENT', 'BUFF', 'SHIELD'] },
+    { id: 'forceUnleashed', cost: 4, cooldown: 3, tags: ['FORCE', 'MAGIC', 'AOE', 'ATTACK'] },
+    { id: 'kineticBeam', cost: 3, cooldown: 2, tags: ['BEAM', 'KINETIC', 'RANGED', 'ATTACK'] },
+];
+
+for (const base of nanomancerBases) {
+    const skill = skillModifierEngine.getModifiedSkill(base, 'NORMAL');
+    assert.strictEqual(skill.cost, base.cost, `${base.id} cost failed`);
+    assert.strictEqual(skill.cooldown, base.cooldown, `${base.id} cooldown failed`);
+    for (const tag of base.tags) {
+        assert(skill.tags.includes(tag), `${base.id} missing tag ${tag}`);
+    }
+}
+
 console.log('Nanomancer skills integration test passed.');
