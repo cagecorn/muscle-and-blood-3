@@ -1,6 +1,7 @@
 // src/game/scenes/WorldMapScene.js
 
-import { Scene } from "phaser";
+// Vite 없이 실행할 수 있도록 phaser ESM을 직접 참조합니다.
+import { Scene } from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
 import { Grid } from "../utils/Grid";
 import { Unit } from "../actors/Unit";
 import { units as unitData } from "../data/units";
