@@ -23,5 +23,11 @@ export const forceMajorArchetype = {
     startingBonus: {
         intelligence: 5,
     },
+
+    // MBTI 선호도 프로필 (임시)
+    mbtiProfile: {
+        N: 3,
+        J: 2,
+    }
 };
 

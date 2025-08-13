@@ -1633,4 +1633,54 @@ export const activeSkills = {
         },
     },
     // --- ▲ [신규] 나노맨서 전용 스킬 4종 추가 ▲ ---
+
+    // --- ▼ [신규] 버서커 & 스펠브레이커 전용 액티브 스킬 추가 ▼ ---
+    frenziedBlow: {
+        yinYangValue: -4,
+        NORMAL: {
+            id: 'frenziedBlow',
+            name: '광폭 일격',
+            type: 'ACTIVE',
+            requiredClass: ['warrior'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.MELEE, SKILL_TAGS.PHYSICAL],
+            cost: 2,
+            targetType: 'enemy',
+            description: '적에게 120%의 물리 피해를 주고, 자신은 1턴간 물리 방어력이 10% 감소합니다.',
+            illustrationPath: null,
+            cooldown: 1,
+            range: 1,
+            damageMultiplier: { min: 1.2, max: 1.4 },
+            selfEffect: {
+                id: 'frenzyDefenseDown',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 1,
+                modifiers: { stat: 'physicalDefense', type: 'percentage', value: -0.1 }
+            }
+        }
+    },
+
+    manaSunder: {
+        yinYangValue: -2,
+        NORMAL: {
+            id: 'manaSunder',
+            name: '마나 분쇄',
+            type: 'ACTIVE',
+            requiredClass: ['warrior'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.DEBUFF],
+            cost: 2,
+            targetType: 'enemy',
+            description: '80%의 물리 피해를 주고, 대상의 마법 공격력을 2턴간 15% 감소시킵니다.',
+            illustrationPath: null,
+            cooldown: 2,
+            range: 1,
+            damageMultiplier: { min: 0.8, max: 1.0 },
+            effect: {
+                id: 'manaSunderDebuff',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 2,
+                modifiers: { stat: 'magicAttack', type: 'percentage', value: -0.15 }
+            }
+        }
+    },
+    // --- ▲ [신규] 버서커 & 스펠브레이커 전용 액티브 스킬 추가 ▲ ---
 };

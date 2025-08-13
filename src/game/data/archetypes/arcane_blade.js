@@ -24,5 +24,13 @@ export const arcaneBladeArchetype = {
     startingBonus: {
         strength: 5,
     },
+
+    // MBTI 선호도 프로필 (임시)
+    mbtiProfile: {
+        E: 2,
+        S: 2,
+        N: 1,
+        T: 1,
+    }
 };
 

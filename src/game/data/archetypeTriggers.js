@@ -11,7 +11,9 @@ export const archetypeTriggers = {
         { archetype: 'FORCE_MAJOR', mbti: ['N', 'J'] },
     ],
     WARRIOR: [
-        // ... 다른 클래스 트리거 정의
+        { archetype: 'DREADNOUGHT', mbti: ['I', 'S'] },
+        { archetype: 'BERSERKER', mbti: ['E', 'P'] },
+        { archetype: 'SPELLBREAKER', mbti: ['N', 'T'] },
     ],
     // ... 추가 클래스
 };
