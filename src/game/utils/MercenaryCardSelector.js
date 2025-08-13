@@ -102,6 +102,26 @@ class MercenaryCardSelector {
                 if (isConventional) score += mercenary.mbti.J;
                 if (!isConventional) score += mercenary.mbti.P;
 
+                // =================================================================
+                // [수정] 스탯 시너지 보너스 시작
+                // =================================================================
+                const finalStats = mercenary.finalStats || {};
+                const scoreMultiplier = 1.5; // 스탯 반영 가중치 (필요시 이 값을 조절하세요)
+
+                if (tags.includes(SKILL_TAGS.MAGIC)) {
+                    // [마법] 태그 스킬은 '지능'에 비례한 보너스를 받습니다.
+                    score += (finalStats.intelligence || 0) * scoreMultiplier;
+                } else if (tags.includes(SKILL_TAGS.MELEE)) {
+                    // [근접] 태그 스킬은 '힘'에 비례한 보너스를 받습니다.
+                    score += (finalStats.strength || 0) * scoreMultiplier;
+                } else if (tags.includes(SKILL_TAGS.RANGED)) {
+                    // [원거리] 태그 스킬은 '민첩'에 비례한 보너스를 받습니다.
+                    score += (finalStats.agility || 0) * scoreMultiplier;
+                }
+                // =================================================================
+                // [수정] 스탯 시너지 보너스 끝
+                // =================================================================
+
                 // ✨ --- [신규] 추가된 태그에 대한 MBTI 선호도 점수 --- ✨
                 // INTJ, ENTJ (전략가, 통솔관)는 전장 통제 스킬을 선호
                 if (tags.includes(SKILL_TAGS.AREA_DENIAL)) score += (mercenary.mbti.N + mercenary.mbti.T) / 2;
