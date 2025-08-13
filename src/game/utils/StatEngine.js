@@ -199,7 +199,8 @@ class StatEngine {
             'movement', 'attackRange', 'weight', 'physicalAttack', 'magicAttack', 'rangedAttack',
             'physicalDefense', 'magicDefense', 'rangedDefense', 'criticalChance', 'criticalDamageMultiplier',
             'physicalEvadeChance', 'magicEvadeChance', 'statusEffectResistance', 'statusEffectApplication',
-            'maxBarrier', 'currentBarrier', 'totalWeight', 'turnValue', 'physicalAttackPercentage', 'magicAttackPercentage'
+            'maxBarrier', 'currentBarrier', 'totalWeight', 'turnValue', 'speed', 'initiativeGauge',
+            'physicalAttackPercentage', 'magicAttackPercentage'
         ];
 
         allStatKeys.forEach(key => {
@@ -228,6 +229,8 @@ class StatEngine {
         finalStats.totalWeight = this.weightEngine.calculateTotalWeight(unitData);
         finalStats.weight = finalStats.totalWeight;
         finalStats.turnValue = this.weightEngine.getTurnValue(finalStats.totalWeight, finalStats.agility);
+        finalStats.speed = Math.max(1, finalStats.agility - finalStats.weight * 0.2);
+        finalStats.initiativeGauge = 0;
 
         return finalStats;
     }
