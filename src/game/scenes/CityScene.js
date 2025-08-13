@@ -17,13 +17,18 @@ export class CityScene extends Scene {
 
         const cityContainer = document.createElement('div');
         cityContainer.id = 'city-container';
+
+        // DOM 컨테이너가 다른 UI 위에 노출되도록 위치와 z-index 지정
         Object.assign(cityContainer.style, {
             position: 'absolute',
+            top: '0',
+            left: '0',
             width: '100%',
             height: '100%',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            zIndex: '10',
             pointerEvents: 'none'
         });
 
@@ -37,9 +42,9 @@ export class CityScene extends Scene {
         cityContainer.appendChild(backButton);
 
         this.events.on('shutdown', () => {
-            const existing = document.getElementById('city-container');
-            if (existing) {
-                existing.remove();
+            const container = document.getElementById('city-container');
+            if (container) {
+                container.remove();
             }
         });
     }
@@ -69,18 +74,28 @@ export class CityScene extends Scene {
         const positions = [3, 4, 5];
         icons.forEach((iconData, index) => {
             const cell = document.createElement('div');
-            cell.style.gridRowStart = `${Math.floor(positions[index] / 3) + 1}`;
-            cell.style.gridColumnStart = `${(positions[index] % 3) + 1}`;
-            cell.style.display = 'flex';
-            cell.style.flexDirection = 'column';
-            cell.style.alignItems = 'center';
-            cell.style.justifyContent = 'center';
+            const row = Math.floor(positions[index] / 3) + 1;
+            const col = (positions[index] % 3) + 1;
+
+            Object.assign(cell.style, {
+                gridRow: `${row}`,
+                gridColumn: `${col}`,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center'
+            });
 
             const iconElement = document.createElement('div');
             iconElement.className = 'building-icon';
             iconElement.style.backgroundImage = `url(assets/images/territory/${iconData.icon}.png)`;
-            iconElement.style.width = '120px';
-            iconElement.style.height = '120px';
+            Object.assign(iconElement.style, {
+                width: '120px',
+                height: '120px',
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center'
+            });
 
             const label = document.createElement('div');
             label.innerText = iconData.name;
@@ -110,7 +125,8 @@ export class CityScene extends Scene {
             backgroundColor: 'rgba(0,0,0,0.7)',
             color: 'white',
             cursor: 'pointer',
-            borderRadius: '5px'
+            borderRadius: '5px',
+            pointerEvents: 'auto'
         });
 
         backButton.onclick = () => {
