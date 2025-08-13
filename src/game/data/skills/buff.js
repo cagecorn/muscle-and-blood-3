@@ -500,4 +500,55 @@ export const buffSkills = {
         }
     },
     // --- ▲ [신규] 나노봇 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 버서커 & 스펠브레이커 버프 스킬 추가 ▼ ---
+    bloodRage: {
+        yinYangValue: -3,
+        NORMAL: {
+            id: 'bloodRage',
+            name: '피의 격노',
+            type: 'BUFF',
+            requiredClass: ['warrior'],
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.PHYSICAL],
+            cost: 2,
+            targetType: 'self',
+            description: '2턴간 물리 공격력이 20% 증가하지만 물리 방어력이 10% 감소합니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            effect: {
+                id: 'bloodRageBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 2,
+                modifiers: [
+                    { stat: 'physicalAttack', type: 'percentage', value: 0.2 },
+                    { stat: 'physicalDefense', type: 'percentage', value: -0.1 }
+                ]
+            }
+        }
+    },
+
+    nullField: {
+        yinYangValue: +2,
+        NORMAL: {
+            id: 'nullField',
+            name: '마력 차단장',
+            type: 'BUFF',
+            requiredClass: ['warrior'],
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.AURA],
+            cost: 2,
+            targetType: 'self',
+            description: '2턴간 자신과 주변 아군의 마법 방어력이 25% 증가합니다.',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 0,
+            aoe: { shape: 'SQUARE', radius: 2 },
+            effect: {
+                id: 'nullFieldBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 2,
+                modifiers: { stat: 'magicDefense', type: 'percentage', value: 0.25 }
+            }
+        }
+    },
+    // --- ▲ [신규] 버서커 & 스펠브레이커 버프 스킬 추가 ▲ ---
 };

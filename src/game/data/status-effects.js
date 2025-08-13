@@ -428,6 +428,44 @@ export const statusEffects = {
         description: '액티브 스킬로 피해를 주면 나노봇이 추가 공격합니다.',
         iconPath: 'assets/images/skills/mechanical-enhancement.png', // 임시로 메카닉 아이콘 재사용
         // onApply, onRemove는 실제 효과가 CombatCalculationEngine에서 처리되므로 필요 없습니다.
-    }
+    },
     // --- ▲ [신규] 나노봇 착용 버프 효과 추가 ▲ ---
+
+    // --- ▼ [신규] 버서커 & 스펠브레이커 상태 효과 추가 ▼ ---
+    bloodRageBuff: {
+        id: 'bloodRageBuff',
+        name: '피의 격노',
+        type: EFFECT_TYPES.BUFF,
+        description: '물리 공격력이 20% 증가하지만 물리 방어력이 10% 감소합니다.',
+        iconPath: 'assets/images/skills/battle_cry.png',
+        modifiers: [
+            { stat: 'physicalAttack', type: 'percentage', value: 0.2 },
+            { stat: 'physicalDefense', type: 'percentage', value: -0.1 }
+        ]
+    },
+    frenzyDefenseDown: {
+        id: 'frenzyDefenseDown',
+        name: '방어 약화',
+        type: EFFECT_TYPES.DEBUFF,
+        description: '물리 방어력이 10% 감소합니다.',
+        iconPath: 'assets/images/skills/shield-break.png',
+        modifiers: { stat: 'physicalDefense', type: 'percentage', value: -0.1 }
+    },
+    manaSunderDebuff: {
+        id: 'manaSunderDebuff',
+        name: '마나 분쇄',
+        type: EFFECT_TYPES.DEBUFF,
+        description: '마법 공격력이 15% 감소합니다.',
+        iconPath: 'assets/images/skills/confusion.png',
+        modifiers: { stat: 'magicAttack', type: 'percentage', value: -0.15 }
+    },
+    nullFieldBuff: {
+        id: 'nullFieldBuff',
+        name: '마력 차단장',
+        type: EFFECT_TYPES.BUFF,
+        description: '마법 방어력이 25% 증가합니다.',
+        iconPath: 'assets/images/skills/mighty-shield.png',
+        modifiers: { stat: 'magicDefense', type: 'percentage', value: 0.25 }
+    }
+    // --- ▲ [신규] 버서커 & 스펠브레이커 상태 효과 추가 ▲ ---
 };

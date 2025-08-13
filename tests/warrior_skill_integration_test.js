@@ -288,6 +288,75 @@ const battleCryBase = {
 };
 // --- ▲ [신규] 전투의 함성 테스트 데이터 추가 ▲ ---
 
+// --- ▼ [신규] 버서커 & 스펠브레이커 스킬 테스트 데이터 추가 ▼ ---
+const frenziedBlowBase = {
+    NORMAL: {
+        id: 'frenziedBlow',
+        type: 'ACTIVE',
+        cost: 2,
+        cooldown: 1,
+        range: 1,
+        damageMultiplier: { min: 1.2, max: 1.4 },
+        selfEffect: {
+            id: 'frenzyDefenseDown',
+            type: 'DEBUFF',
+            duration: 1,
+            modifiers: { stat: 'physicalDefense', type: 'percentage', value: -0.1 }
+        }
+    }
+};
+
+const bloodRageBase = {
+    NORMAL: {
+        id: 'bloodRage',
+        type: 'BUFF',
+        cost: 2,
+        cooldown: 3,
+        effect: {
+            id: 'bloodRageBuff',
+            type: 'BUFF',
+            duration: 2,
+            modifiers: [
+                { stat: 'physicalAttack', type: 'percentage', value: 0.2 },
+                { stat: 'physicalDefense', type: 'percentage', value: -0.1 }
+            ]
+        }
+    }
+};
+
+const manaSunderBase = {
+    NORMAL: {
+        id: 'manaSunder',
+        type: 'ACTIVE',
+        cost: 2,
+        cooldown: 2,
+        range: 1,
+        damageMultiplier: { min: 0.8, max: 1.0 },
+        effect: {
+            id: 'manaSunderDebuff',
+            type: 'DEBUFF',
+            duration: 2,
+            modifiers: { stat: 'magicAttack', type: 'percentage', value: -0.15 }
+        }
+    }
+};
+
+const nullFieldBase = {
+    NORMAL: {
+        id: 'nullField',
+        type: 'BUFF',
+        cost: 2,
+        cooldown: 4,
+        effect: {
+            id: 'nullFieldBuff',
+            type: 'BUFF',
+            duration: 2,
+            modifiers: { stat: 'magicDefense', type: 'percentage', value: 0.25 }
+        }
+    }
+};
+// --- ▲ [신규] 버서커 & 스펠브레이커 스킬 테스트 데이터 추가 ▲ ---
+
 // ------- Grade/Rank Tests -------
 const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
 
@@ -471,6 +540,26 @@ for (const grade of grades) {
     assert(skill.effect && skill.effect.chance === 0.3, 'Shield Bash effect failed');
 }
 // --- ▲ [신규] 도발 & 방패 치기 테스트 로직 추가 ▲ ---
+
+// --- ▼ [신규] 버서커 & 스펠브레이커 스킬 테스트 로직 추가 ▼ ---
+{
+    const skill = skillModifierEngine.getModifiedSkill(frenziedBlowBase.NORMAL, 'NORMAL');
+    assert.strictEqual(skill.cooldown, 1, 'Frenzied Blow cooldown failed');
+    assert(skill.selfEffect && skill.selfEffect.modifiers.value === -0.1, 'Frenzied Blow selfEffect failed');
+}
+{
+    const skill = skillModifierEngine.getModifiedSkill(bloodRageBase.NORMAL, 'NORMAL');
+    assert(skill.effect && Array.isArray(skill.effect.modifiers), 'Blood Rage modifiers missing');
+}
+{
+    const skill = skillModifierEngine.getModifiedSkill(manaSunderBase.NORMAL, 'NORMAL');
+    assert(skill.effect && skill.effect.modifiers.stat === 'magicAttack', 'Mana Sunder effect failed');
+}
+{
+    const skill = skillModifierEngine.getModifiedSkill(nullFieldBase.NORMAL, 'NORMAL');
+    assert(skill.effect && skill.effect.modifiers.stat === 'magicDefense', 'Null Field effect failed');
+}
+// --- ▲ [신규] 버서커 & 스펠브레이커 스킬 테스트 로직 추가 ▲ ---
 
 // Throwing Axe
 for (const grade of grades) {
