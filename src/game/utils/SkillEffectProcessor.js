@@ -435,7 +435,10 @@ class SkillEffectProcessor {
             tokenEngine.addTokens(unit.uniqueId, skill.generatesToken.amount, `${skill.name} 효과`);
         }
         if (skill.turnOrderEffect === 'pushToBack' && this.battleSimulator) {
-            this.battleSimulator.turnQueue = turnOrderManager.pushToBack(this.battleSimulator.turnQueue, target);
+            this.battleSimulator.actionQueue = turnOrderManager.pushToBack(
+                this.battleSimulator.actionQueue,
+                target
+            );
         }
         if (skill.push > 0) {
             await formationEngine.pushUnit(target, unit, skill.push, this.animationEngine);

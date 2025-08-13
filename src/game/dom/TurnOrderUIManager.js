@@ -16,11 +16,11 @@ export class TurnOrderUIManager {
 
     /**
      * 턴 순서 UI를 표시하고 초기화합니다.
-     * @param {Array<object>} initialTurnQueue - 최초 턴 순서 배열
+     * @param {Array<object>} initialQueue - 최초 액션 큐
      */
-    show(initialTurnQueue) {
+    show(initialQueue) {
         this.container.innerHTML = '';
-        this.update(initialTurnQueue);
+        this.update(initialQueue);
         this.container.style.display = 'block';
     }
 
@@ -33,13 +33,14 @@ export class TurnOrderUIManager {
 
     /**
      * 새로운 턴 순서에 맞춰 UI를 다시 그립니다.
-     * @param {Array<object>} newTurnQueue - 갱신된 턴 순서 배열
+     * @param {Array<object>} newQueue - 갱신된 액션 큐
      */
-    update(newTurnQueue) {
+    update(newQueue) {
         this.container.innerHTML = '';
 
-        newTurnQueue.forEach(unit => {
-            if (unit.currentHp <= 0) return;
+        newQueue.forEach(entry => {
+            const unit = entry.unitId ? turnOrderManager.getUnit(entry.unitId) : entry;
+            if (!unit || unit.currentHp <= 0) return;
 
             const unitEntry = document.createElement('div');
             unitEntry.className = 'turn-order-entry';
