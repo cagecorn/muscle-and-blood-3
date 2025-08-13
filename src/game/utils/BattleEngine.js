@@ -1,3 +1,5 @@
+import { turnOrderManager } from './TurnOrderManager.js';
+
 /**
  * 전투 로직의 기반이 되는 엔진
  * 현재는 간단한 구조만 제공하며, 이후 전투 기능 구현 시 확장될 예정이다.
@@ -16,7 +18,8 @@ class BattleEngine {
         this.currentBattle = {
             allies,
             enemies,
-            turn: 0
+            turn: 1,
+            phase: 'planning'
         };
         console.log('Battle started', this.currentBattle);
     }
@@ -27,7 +30,18 @@ class BattleEngine {
      */
     update() {
         if (!this.currentBattle) return;
-        // TODO: turn processing logic
+
+        const battle = this.currentBattle;
+        if (battle.phase === 'planning') {
+            const units = [...battle.allies, ...battle.enemies];
+            turnOrderManager.collectActions(units);
+            turnOrderManager.createTurnQueue();
+            battle.phase = 'resolution';
+        } else if (battle.phase === 'resolution') {
+            turnOrderManager.resolve();
+            battle.turn += 1;
+            battle.phase = 'planning';
+        }
     }
 
     /**
