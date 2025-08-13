@@ -24,15 +24,13 @@ class TurnOrderManager {
 
         units.forEach(unit => {
             this.unitRegistry.set(unit.uniqueId, unit);
-            if (unit.finalStats?.initiativeGauge >= 100) {
-                const result = resolver(unit);
-                if (result && result.action !== undefined) {
-                    this.actionQueue.push({
-                        unitId: unit.uniqueId,
-                        action: result.action,
-                        initiative: result.initiative ?? 0
-                    });
-                }
+            const result = resolver(unit);
+            if (result && result.action !== undefined) {
+                this.actionQueue.push({
+                    unitId: unit.uniqueId,
+                    action: result.action,
+                    initiative: result.initiative ?? 0
+                });
             }
         });
 
@@ -64,7 +62,7 @@ class TurnOrderManager {
      * 정렬된 액션 큐를 순서대로 실행합니다.
      * 실제 행동 적용 로직은 추후 구현됩니다.
      */
-    async resolve() {
+    async resolve(onResolved) {
         for (const entry of this.actionQueue) {
             const unit = this.getUnit(entry.unitId);
             const name = unit?.instanceName ?? 'Unknown';
@@ -74,6 +72,10 @@ class TurnOrderManager {
                 await entry.action();
             } else {
                 debugLogEngine.log('TurnOrderManager', `${name}가 '${entry.action}'를 실행합니다.`);
+            }
+
+            if (onResolved) {
+                onResolved(entry.unitId);
             }
         }
         this.actionQueue = [];

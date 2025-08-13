@@ -1,53 +1,73 @@
 import { debugLogEngine } from './DebugLogEngine.js';
 
 /**
- * 이니셔티브 게이지를 관리하는 엔진
+ * 단순한 이니셔티브 게이지 엔진.
+ * 각 유닛은 속도에 따라 게이지가 증가하며, 임계치에 도달하면 행동할 준비가 됩니다.
  */
 class InitiativeGaugeEngine {
-    constructor() {
-        this.registry = new Map(); // unitId -> { gauge, speed }
+    constructor(threshold = 100) {
+        this.threshold = threshold;
+        this.gauges = new Map(); // unitId -> gauge value
         debugLogEngine.log('InitiativeGaugeEngine', '이니셔티브 게이지 엔진이 초기화되었습니다.');
     }
 
     /**
-     * 유닛의 속도를 설정합니다. 기존 게이지는 유지됩니다.
-     * @param {string|number} unitId
-     * @param {number} speed
+     * 전투 시작 시 유닛들을 등록하여 게이지를 0으로 초기화합니다.
+     * @param {Array<object>} units
      */
-    setSpeed(unitId, speed) {
-        const entry = this.registry.get(unitId) || { gauge: 0, speed: 0 };
-        entry.speed = speed;
-        this.registry.set(unitId, entry);
+    registerUnits(units) {
+        this.gauges.clear();
+        units.forEach(u => this.gauges.set(u.uniqueId, 0));
+        debugLogEngine.log('InitiativeGaugeEngine', `${units.length}명의 유닛이 등록되었습니다.`);
     }
 
     /**
-     * 모든 유닛의 게이지를 갱신하고 100을 넘는 유닛을 반환합니다.
-     * @param {number} deltaMs
-     * @returns {Array<string|number>} 행동 가능한 유닛 ID 목록
+     * 각 유닛의 게이지를 속도만큼 증가시킵니다.
+     * @param {Array<object>} units
+     * @returns {Array<object>} 행동 준비가 된 유닛 목록
      */
-    tick(deltaMs) {
+    tick(units = []) {
         const ready = [];
-        for (const [unitId, data] of this.registry.entries()) {
-            data.gauge += data.speed * deltaMs;
-            if (data.gauge >= 100) {
-                ready.push(unitId);
+        for (const unit of units) {
+            const id = unit.uniqueId;
+            const current = this.gauges.get(id) ?? 0;
+            const speed = unit.speed ?? 0;
+            const updated = current + speed;
+            this.gauges.set(id, updated);
+            if (updated >= this.threshold) {
+                ready.push(unit);
             }
         }
         return ready;
     }
 
     /**
-     * 행동을 마친 유닛의 게이지를 100만큼 감소시킵니다.
-     * @param {string|number} unitId
+     * 특정 유닛의 현재 게이지 값을 반환합니다.
+     * @param {object} unit
+     * @returns {number}
      */
-    resetGauge(unitId) {
-        const data = this.registry.get(unitId);
-        if (data) {
-            data.gauge -= 100;
+    getGauge(unit) {
+        return this.gauges.get(unit.uniqueId) ?? 0;
+    }
+
+    /**
+     * 특정 유닛의 게이지를 0으로 초기화합니다.
+     * @param {object|string|number} unitOrId
+     */
+    resetGauge(unitOrId) {
+        const id = typeof unitOrId === 'object' ? unitOrId.uniqueId : unitOrId;
+        if (this.gauges.has(id)) {
+            this.gauges.set(id, 0);
         }
+    }
+
+    /**
+     * 모든 게이지 정보를 제거합니다.
+     */
+    clear() {
+        this.gauges.clear();
     }
 }
 
 export { InitiativeGaugeEngine };
 export const initiativeGaugeEngine = new InitiativeGaugeEngine();
-
