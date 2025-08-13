@@ -99,7 +99,10 @@ function createMeleeAI(engines = {}) {
         new UseBuffSkillOrWaitNode(engines)
     ]);
 
-    return new BehaviorTree(rootNode);
+    // BehaviorTree 인스턴스를 생성하고 반환합니다.
+    // planAction() 메서드는 BehaviorTree에서 제공하므로 추가 설정 없이 사용할 수 있습니다.
+    const tree = new BehaviorTree(rootNode);
+    return tree;
 }
 
 export { createMeleeAI };

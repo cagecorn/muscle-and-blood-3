@@ -1,4 +1,5 @@
 import { turnOrderManager } from './TurnOrderManager.js';
+import { aiManager } from '../../ai/AIManager.js';
 
 /**
  * 전투 로직의 기반이 되는 엔진
@@ -21,6 +22,11 @@ class BattleEngine {
             turn: 1,
             phase: 'planning'
         };
+
+        // AI 유닛을 등록합니다.
+        aiManager.clear();
+        [...allies, ...enemies].forEach(u => aiManager.registerUnit(u));
+
         console.log('Battle started', this.currentBattle);
     }
 
@@ -28,17 +34,17 @@ class BattleEngine {
      * 매 턴 호출되어 전투를 진행한다.
      * 상세 로직은 추후 구현한다.
      */
-    update() {
+    async update() {
         if (!this.currentBattle) return;
 
         const battle = this.currentBattle;
         if (battle.phase === 'planning') {
-            const units = [...battle.allies, ...battle.enemies];
-            turnOrderManager.collectActions(units);
+            const units = [...battle.allies, ...battle.enemies].filter(u => u.currentHp > 0);
+            turnOrderManager.collectActions(units, unit => aiManager.planAction(unit, units));
             turnOrderManager.createTurnQueue();
             battle.phase = 'resolution';
         } else if (battle.phase === 'resolution') {
-            turnOrderManager.resolve();
+            await turnOrderManager.resolve();
             battle.turn += 1;
             battle.phase = 'planning';
         }
