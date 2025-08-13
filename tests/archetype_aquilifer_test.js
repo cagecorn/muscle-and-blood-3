@@ -6,7 +6,8 @@ console.log('--- 🏳️ 아퀼리퍼 아키타입 통합 테스트 시작 ---')
 
 // 아키타입 할당을 결정론적으로 만들기 위해 Math.random 고정
 const originalRandom = Math.random;
-Math.random = () => 0.6; // 아퀼리퍼 구간으로 설정
+// 다른 아키타입의 추가로 확률 분포가 바뀌어 범위를 재조정함
+Math.random = () => 0.2; // 아퀼리퍼 확률 구간에 해당하는 값
 
 // 1. 아퀼리퍼에 어울리는 MBTI를 가진 가상 용병 생성
 const mockAquiliferMerc = {
