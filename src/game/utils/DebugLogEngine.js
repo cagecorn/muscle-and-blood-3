@@ -36,8 +36,8 @@ class DebugLogEngine {
 
         const logEntry = {
             timestamp: new Date().toISOString(),
-            level: level,
-            source: source,
+            level,
+            source,
             message: args.map(arg => {
                 try {
                     JSON.stringify(arg);
@@ -47,11 +47,22 @@ class DebugLogEngine {
                 }
             })
         };
-        this.logHistory.push(logEntry);
+
+        const last = this.logHistory[this.logHistory.length - 1];
+        const isDuplicate =
+            last &&
+            last.level === logEntry.level &&
+            last.source === logEntry.source &&
+            JSON.stringify(last.message) === JSON.stringify(logEntry.message);
+        if (!isDuplicate) {
+            this.logHistory.push(logEntry);
+        }
 
         const color = this._getSourceColor(source);
         const consoleMethod = console[level] || console.log;
-        consoleMethod(`%c[${source}]`, `color: ${color}; font-weight: bold;`, ...args);
+        if (!isDuplicate) {
+            consoleMethod(`%c[${source}]`, `color: ${color}; font-weight: bold;`, ...args);
+        }
     }
 
     log(source, ...args) {
