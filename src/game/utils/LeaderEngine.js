@@ -1,4 +1,5 @@
 import * as Phaser from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
+import { cityEngine } from './CityEngine.js';
 
 /**
  * 월드 맵에서 플레이어 리더를 제어하는 엔진.
@@ -74,7 +75,23 @@ export class LeaderEngine {
                 y: worldY,
                 ease: 'Sine.easeInOut',
                 duration: 200,
+                onComplete: () => {
+                    this.checkCityInteraction();
+                }
             });
+        }
+    }
+
+    /**
+     * 현재 위치에 도시가 있는지 확인하고, 있다면 해당 도시 씬으로 전환합니다.
+     */
+    checkCityInteraction() {
+        const cities = cityEngine.getCities();
+        const city = cities.find(c => c.tileX === this.tileX && c.tileY === this.tileY);
+
+        if (city) {
+            console.log(`Entering city: ${city.name}`);
+            this.scene.scene.start(city.scene, { cityName: city.name });
         }
     }
 }

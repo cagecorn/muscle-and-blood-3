@@ -1,4 +1,5 @@
 import * as Phaser from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
+import { cityEngine } from './CityEngine.js';
 
 /**
  * 간단한 월드 맵 엔진. Tilemap API 대신 각 타일을 이미지로 직접 배치합니다.
@@ -41,6 +42,15 @@ export class WorldMapEngine {
                 this.tiles.push(tile);
             }
         }
+
+        // 도시 아이콘을 추가합니다.
+        const cities = cityEngine.getCities();
+        cities.forEach(city => {
+            const cityX = city.tileX * this.TILE_WIDTH;
+            const cityY = city.tileY * this.TILE_HEIGHT;
+            const cityIcon = this.scene.add.image(cityX, cityY, city.icon).setOrigin(0, 0);
+            cityIcon.setDepth(1);
+        });
 
         // 카메라 경계를 설정합니다.
         this.scene.cameras.main.setBounds(0, 0, this.widthInPixels, this.heightInPixels);
