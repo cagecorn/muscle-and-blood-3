@@ -20,6 +20,7 @@ import { EquipmentManagementScene } from './EquipmentManagementScene.js';
 import { ArenaScene } from './ArenaScene.js';
 import { ArenaBattleScene } from './ArenaBattleScene.js';
 import { WorldMapScene } from './WorldMapScene.js'; // 월드맵 씬 import 추가
+import { CityScene } from './CityScene.js';
 
 export class Boot extends Scene
 {
@@ -56,6 +57,7 @@ export class Boot extends Scene
         this.scene.add('ArenaScene', ArenaScene);
         this.scene.add('ArenaBattleScene', ArenaBattleScene);
         this.scene.add('WorldMapScene', WorldMapScene); // 월드맵 씬 추가
+        this.scene.add('CityScene', CityScene);
 
         this.scene.start('Preloader');
     }

@@ -105,11 +105,13 @@ export class Preloader extends Scene
         this.load.image('dark-knight-ui', 'images/unit/dark-knight-ui.png');
         // --- ▲ [신규] 다크나이트 UI 이미지 로드 ▲ ---
 
-        // 영지 씬에 사용할 배경 이미지를 로드합니다.
+        // 영지 및 도시 씬에 사용할 배경 이미지를 로드합니다.
         this.load.image('city-1', 'images/territory/city-1.png');
+        this.load.image('city-1-bg', 'images/territory/city-1.png');
 
         // 여관 아이콘 이미지를 로드합니다.
         this.load.image('tavern-icon', 'images/territory/tavern-icon.png');
+        this.load.image('inventory-icon', 'images/territory/inventory-icon.png');
 
         // --- 추가된 애셋들 ---
         this.load.image('tavern-scene', 'images/territory/tavern-scene.png');
@@ -121,6 +123,9 @@ export class Preloader extends Scene
         // --- ▼ [신규] 월드맵 애셋 로드 ▼ ---
         // 리더 스프라이트
         this.load.image('leader-infp', 'images/leaders/infp.png');
+
+        // 월드맵 도시 아이콘
+        this.load.image('mab-city-1-icon', 'images/world-mab/mab-city-1.png');
 
         // 월드맵 타일 (15개)
         for (let i = 1; i <= 15; i++) {
