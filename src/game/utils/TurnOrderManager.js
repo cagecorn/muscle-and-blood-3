@@ -58,6 +58,20 @@ class TurnOrderManager {
     }
 
     /**
+     * 정렬된 액션 큐를 순서대로 실행합니다.
+     * 실제 행동 적용 로직은 추후 구현됩니다.
+     */
+    resolve() {
+        this.actionQueue.forEach(entry => {
+            const unit = this.getUnit(entry.unitId);
+            const name = unit?.instanceName ?? 'Unknown';
+            debugLogEngine.log('TurnOrderManager', `${name}가 '${entry.action}'를 실행합니다.`);
+            // TODO: 실제 액션 처리 로직
+        });
+        this.actionQueue = [];
+    }
+
+    /**
      * 동일한 이니셔티브가 충돌했을 때 호출되는 훅
      * 기본 동작은 무작위로 우선 순위를 정합니다.
      * @param {object} a
