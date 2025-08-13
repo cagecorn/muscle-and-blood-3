@@ -18,6 +18,12 @@ export class LeaderEngine {
         // 맵의 중앙에서 시작합니다.
         this.tileX = Math.floor(mapEngine.MAP_WIDTH_IN_TILES / 2);
         this.tileY = Math.floor(mapEngine.MAP_HEIGHT_IN_TILES / 2);
+
+        /**
+         * 현재 턴에서 이미 이동했는지 여부
+         * @type {boolean}
+         */
+        this.hasMovedThisTurn = false;
     }
 
     /**
@@ -40,6 +46,11 @@ export class LeaderEngine {
      * @param {'up' | 'down' | 'left' | 'right'} direction
      */
     move(direction) {
+        // 이미 이동했다면 추가 이동을 막습니다.
+        if (this.hasMovedThisTurn) {
+            return;
+        }
+
         let targetX = this.tileX;
         let targetY = this.tileY;
 
@@ -62,6 +73,7 @@ export class LeaderEngine {
 
         if (targetX >= 0 && targetX < this.mapEngine.MAP_WIDTH_IN_TILES &&
             targetY >= 0 && targetY < this.mapEngine.MAP_HEIGHT_IN_TILES) {
+            this.hasMovedThisTurn = true;
             this.tileX = targetX;
             this.tileY = targetY;
 

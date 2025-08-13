@@ -26,7 +26,8 @@ export class WorldMapTurnEngine {
      * @param {'up' | 'down' | 'left' | 'right'} direction
      */
     handleMove(direction) {
-        if (!this.isPlayerTurn) return;
+        // 이동이 이미 이루어졌다면 이번 턴에는 추가 이동을 허용하지 않습니다.
+        if (!this.isPlayerTurn || this.leader.hasMovedThisTurn) return;
 
         this.isPlayerTurn = false;
         this.leader.move(direction);
@@ -35,6 +36,7 @@ export class WorldMapTurnEngine {
 
         this.scene.time.delayedCall(200, () => {
             this.isPlayerTurn = true;
+            this.leader.hasMovedThisTurn = false; // 턴 종료 시 이동 플래그 리셋
         });
     }
 }
