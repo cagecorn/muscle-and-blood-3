@@ -1,11 +1,10 @@
 // src/game/scenes/WorldMapScene.js
 
-import { Scene } from "phaser";
-// --- 수정된 부분 ---
-import { Grid } from "../utils/Grid.js";
-import { Unit } from "../actors/Unit.js";
-import { units as unitData } from "../data/units.js";
-// --------------------
+// Vite 없이 실행할 수 있도록 phaser ESM을 직접 참조합니다.
+import { Scene } from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
+import { Grid } from "../utils/Grid";
+import { Unit } from "../actors/Unit";
+import { units as unitData } from "../data/units";
 
 export class WorldMapScene extends Scene {
   constructor() {
@@ -23,24 +22,54 @@ export class WorldMapScene extends Scene {
     this.grid.add(player.sprite, 5, 10);
 
     // 적군 지휘관 생성
-    const enemyCommander = new Unit(this, 25, 10, unitData.enemyCommander, "enemy");
+    const enemyCommander = new Unit(
+      this,
+      25,
+      10,
+      unitData.enemyCommander,
+      "enemy"
+    );
     this.units.push(enemyCommander);
     this.grid.add(enemyCommander.sprite, 25, 10);
 
     // 용병 생성 (2명씩)
-    const alliedMerc1 = new Unit(this, 5, 12, unitData.alliedMercenary, "player");
+    const alliedMerc1 = new Unit(
+      this,
+      5,
+      12,
+      unitData.alliedMercenary,
+      "player"
+    );
     this.units.push(alliedMerc1);
     this.grid.add(alliedMerc1.sprite, 5, 12);
 
-    const alliedMerc2 = new Unit(this, 7, 12, unitData.alliedMercenary, "player");
+    const alliedMerc2 = new Unit(
+      this,
+      7,
+      12,
+      unitData.alliedMercenary,
+      "player"
+    );
     this.units.push(alliedMerc2);
     this.grid.add(alliedMerc2.sprite, 7, 12);
 
-    const enemyMerc1 = new Unit(this, 23, 12, unitData.enemyMercenary, "enemy");
+    const enemyMerc1 = new Unit(
+      this,
+      23,
+      12,
+      unitData.enemyMercenary,
+      "enemy"
+    );
     this.units.push(enemyMerc1);
     this.grid.add(enemyMerc1.sprite, 23, 12);
 
-    const enemyMerc2 = new Unit(this, 25, 12, unitData.enemyMercenary, "enemy");
+    const enemyMerc2 = new Unit(
+      this,
+      25,
+      12,
+      unitData.enemyMercenary,
+      "enemy"
+    );
     this.units.push(enemyMerc2);
     this.grid.add(enemyMerc2.sprite, 25, 12);
 
@@ -60,4 +89,3 @@ export class WorldMapScene extends Scene {
     // 이 안에 행동력 기반의 전투 로직이 들어갈 예정입니다.
   }
 }
-
