@@ -1,6 +1,7 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 import { formationEngine } from '../../game/utils/FormationEngine.js';
+import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 
 class FindMeleeStrategicTargetNode extends Node {
     constructor({ targetManager, pathfinderEngine }) {
@@ -43,7 +44,10 @@ class FindMeleeStrategicTargetNode extends Node {
 
         for (const bestCell of potentialAttackCells) {
             const path = await this.pathfinderEngine.findPath(unit, start, { col: bestCell.col, row: bestCell.row });
-            if (path && path.length > 0) return path;
+            if (Array.isArray(path) && path.length > 0) return path;
+            if (path) {
+                debugLogEngine.warn('FindMeleeStrategicTargetNode', 'findPath가 배열을 반환하지 않았습니다.', path);
+            }
         }
         return null;
     }
@@ -66,10 +70,13 @@ class FindMeleeStrategicTargetNode extends Node {
 
         for (const lowHpEnemy of lowHpEnemies) {
             const path = await this._findPathToUnit(unit, lowHpEnemy);
-            if (path && path.length <= movementRange) {
+            if (Array.isArray(path) && path.length <= movementRange) {
                 blackboard.set('movementTarget', lowHpEnemy);
                 debugAIManager.logNodeResult(NodeState.SUCCESS, `체력이 적고 도달 가능한 타겟 [${lowHpEnemy.instanceName}] 설정`);
                 return NodeState.SUCCESS;
+            }
+            if (path && !Array.isArray(path)) {
+                debugLogEngine.warn('FindMeleeStrategicTargetNode', '_findPathToUnit이 배열이 아닌 값을 반환했습니다.', path);
             }
         }
 
