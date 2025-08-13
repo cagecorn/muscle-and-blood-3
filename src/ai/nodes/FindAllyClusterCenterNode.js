@@ -1,5 +1,6 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
+import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 
 /**
  * 모든 아군 유닛들의 평균 위치(중심점) 근처의 가장 가까운 빈 셀로 이동 경로를 설정하는 노드.
@@ -46,10 +47,13 @@ class FindAllyClusterCenterNode extends Node {
         const bestCell = availableCells[0];
 
         const path = await this.pathfinderEngine.findPath(unit, { col: unit.gridX, row: unit.gridY }, { col: bestCell.col, row: bestCell.row });
-        if (path && path.length > 0) {
+        if (Array.isArray(path) && path.length > 0) {
             blackboard.set('movementPath', path);
             debugAIManager.logNodeResult(NodeState.SUCCESS, `아군 중심(${bestCell.col}, ${bestCell.row})으로 경로 설정`);
             return NodeState.SUCCESS;
+        }
+        if (path) {
+            debugLogEngine.warn('FindAllyClusterCenterNode', 'findPath가 배열을 반환하지 않았습니다.', path);
         }
         
         debugAIManager.logNodeResult(NodeState.FAILURE, '아군 중심점으로의 경로 탐색 실패');

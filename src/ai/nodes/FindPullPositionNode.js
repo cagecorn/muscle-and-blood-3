@@ -1,5 +1,6 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
+import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 
 /**
  * 적에게는 가깝지만, 아군과는 1칸의 거리를 유지하는 최적의 위치를 찾는 노드.
@@ -55,10 +56,12 @@ class FindPullPositionNode extends Node {
                 { col: unit.gridX, row: unit.gridY },
                 { col: bestCell.col, row: bestCell.row }
             );
-            if (path && path.length > 0) {
+            if (Array.isArray(path) && path.length > 0) {
                 blackboard.set('movementPath', path);
                 debugAIManager.logNodeResult(NodeState.SUCCESS, `끌어당기기 위치 (${bestCell.col}, ${bestCell.row})로 경로 설정`);
                 return NodeState.SUCCESS;
+            } else if (path) {
+                debugLogEngine.warn('FindPullPositionNode', 'findPath가 배열을 반환하지 않았습니다.', path);
             }
         }
 

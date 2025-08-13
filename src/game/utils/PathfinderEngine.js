@@ -50,7 +50,12 @@ class PathfinderEngine {
             closedSet.add(`${currentNode.col},${currentNode.row}`);
 
             if (currentNode.col === endNode.col && currentNode.row === endNode.row) {
-                return this._retracePath(startNode, currentNode);
+                const finalPath = this._retracePath(startNode, currentNode);
+                if (!Array.isArray(finalPath)) {
+                    debugLogEngine.warn('PathfinderEngine', '비정상적인 경로 반환 값', finalPath);
+                    return [];
+                }
+                return finalPath;
             }
 
             this._getNeighbors(currentNode).forEach(neighbor => {
@@ -138,6 +143,10 @@ class PathfinderEngine {
             }
         }
 
+        if (!Array.isArray(tiles)) {
+            debugLogEngine.warn('PathfinderEngine', 'findAllReachableTiles가 배열을 반환하지 않았습니다.', tiles);
+            return [];
+        }
         return tiles;
     }
 
@@ -173,15 +182,22 @@ class PathfinderEngine {
         const reachable = [];
         for (const tile of candidateTiles) {
             const path = await this.findPath(unit, start, tile);
-            if (path && path.length <= moveRange) {
+            if (Array.isArray(path) && path.length <= moveRange) {
                 reachable.push({ path });
+            } else if (path) {
+                debugLogEngine.warn('PathfinderEngine', 'findPath가 배열이 아닌 값을 반환했습니다.', { tile, path });
             }
         }
 
         if (reachable.length === 0) return null;
 
         reachable.sort((a, b) => a.path.length - b.path.length);
-        return reachable[0].path;
+        const best = reachable[0].path;
+        if (!Array.isArray(best)) {
+            debugLogEngine.warn('PathfinderEngine', '최적 경로가 배열이 아닙니다.', best);
+            return [];
+        }
+        return best;
     }
 
     _retracePath(startNode, endNode) {

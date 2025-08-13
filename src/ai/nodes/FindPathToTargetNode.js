@@ -1,5 +1,6 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
+import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 
 class FindPathToTargetNode extends Node {
     constructor({ pathfinderEngine, formationEngine }) {
@@ -71,7 +72,10 @@ class FindPathToTargetNode extends Node {
 
         for (const bestCell of potentialCells) {
             const path = await this.pathfinderEngine.findPath(unit, start, { col: bestCell.col, row: bestCell.row });
-            if (path && path.length > 0) return path;
+            if (Array.isArray(path) && path.length > 0) return path;
+            if (path) {
+                debugLogEngine.warn('FindPathToTargetNode', 'findPath가 배열을 반환하지 않았습니다.', path);
+            }
         }
         return null;
     }

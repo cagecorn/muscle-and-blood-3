@@ -1,5 +1,6 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
+import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 import MoveToTargetNode from './MoveToTargetNode.js';
 
 class MoveToUseSkillNode extends Node {
@@ -22,6 +23,13 @@ class MoveToUseSkillNode extends Node {
         let path = blackboard.get('movementPath');
         if (!path) {
             path = await this.pathfinderEngine.findBestPathToAttack(unit, skill, target);
+            if (path && !Array.isArray(path)) {
+                debugLogEngine.warn('MoveToUseSkillNode', 'findBestPathToAttack가 배열이 아닌 값을 반환했습니다.', {
+                    skill: skill.name,
+                    target: target.instanceName,
+                });
+                return NodeState.FAILURE;
+            }
             if (!path) {
                 debugAIManager.logNodeResult(
                     NodeState.FAILURE,

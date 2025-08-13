@@ -1,5 +1,6 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
+import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 
 /**
  * 전투가 잠잠할 때 유리한 위치로 이동하기 위한 위치를 탐색합니다.
@@ -72,13 +73,15 @@ class FindSafeRepositionNode extends Node {
                 { col: unit.gridX, row: unit.gridY },
                 { col: bestCell.col, row: bestCell.row }
             );
-            if (path && path.length > 0) {
+            if (Array.isArray(path) && path.length > 0) {
                 blackboard.set('movementPath', path);
                 debugAIManager.logNodeResult(
                     NodeState.SUCCESS,
                     `재배치 위치 (${bestCell.col}, ${bestCell.row}) 경로 설정 (Score: ${maxScore.toFixed(2)})`
                 );
                 return NodeState.SUCCESS;
+            } else if (path) {
+                debugLogEngine.warn('FindSafeRepositionNode', 'findPath가 배열을 반환하지 않았습니다.', path);
             }
         }
 
