@@ -6,7 +6,8 @@ console.log('--- ❄️ 프로스트위버 아키타입 통합 테스트 시작 
 
 // Math.random을 고정하여 아키타입 할당을 결정론적으로 만듭니다.
 const originalRandom = Math.random;
-Math.random = () => 0.3; // 프로스트위버 구간에 해당하는 값 선택
+// 아키타입이 늘어나며 확률 분포가 변경되어 값 재조정
+Math.random = () => 0.2; // 프로스트위버 확률 구간에 해당하는 값
 
 // 1. 프로스트위버에 어울리는 MBTI를 가진 가상 용병 생성
 const mockFrostweaverMerc = {
