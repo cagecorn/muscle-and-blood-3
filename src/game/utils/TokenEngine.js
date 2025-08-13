@@ -46,6 +46,25 @@ class TokenEngine {
     }
 
     /**
+     * InitiativeGaugeEngine에서 행동 게이지가 가득 찼다고 알릴 때 호출됩니다.
+     * 토큰을 3개로 재충전하며, 잔여 토큰은 모두 소멸됩니다.
+     * @param {number} unitId - 토큰을 재설정할 유닛의 고유 ID
+     */
+    onGaugeFilled(unitId) {
+        const data = this.tokenData.get(unitId);
+        if (!data) return;
+
+        const previous = data.currentTokens;
+        data.currentTokens = 3;
+        data.pendingTokens = 3;
+
+        const changeAmount = data.currentTokens - previous;
+        if (changeAmount !== 0) {
+            debugTokenManager.logTokenChange(unitId, data.unitName, '게이지 충전', changeAmount, data.currentTokens);
+        }
+    }
+
+    /**
      * 특정 유닛에게 토큰을 추가합니다.
      * @param {number} unitId - 토큰을 받을 유닛의 고유 ID
      * @param {number} amount - 추가할 토큰의 양
@@ -100,11 +119,11 @@ class TokenEngine {
     }
 
     /**
-     * 계획된 토큰 변동을 확정합니다. 실패 시 롤백합니다.
+     * 토큰 사용 계획을 확정하거나 취소합니다.
      * @param {number} unitId - 유닛의 고유 ID
      * @param {boolean} success - true면 계획 확정, false면 롤백
      */
-    finalizeTokens(unitId, success) {
+    resolve(unitId, success = true) {
         const data = this.tokenData.get(unitId);
         if (!data) return;
 
