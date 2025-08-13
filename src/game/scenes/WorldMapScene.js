@@ -1,6 +1,6 @@
 // src/game/scenes/WorldMapScene.js
 
-import { Scene } from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
+import { Scene } from "phaser";
 // --- 수정된 부분 ---
 import { Grid } from "../utils/Grid.js";
 import { Unit } from "../actors/Unit.js";
