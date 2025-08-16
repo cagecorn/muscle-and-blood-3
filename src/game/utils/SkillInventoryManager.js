@@ -77,9 +77,34 @@ class SkillInventoryManager {
             this.addSkillById('nanobot', 'NORMAL');
         }
 
+        // ✨ [신규] 추가된 스킬 카드들을 몇 장씩 지급합니다.
+        const newSkillIds = [
+            'flameWhip',
+            'thunderStrike',
+            'shadowStep',
+            'chainLightning',
+            'soulDrain',
+            'battleCry',
+            'windBlessing',
+            'berserkRage',
+            'curseOfWeakness',
+            'silence',
+            'infectiousWound',
+            'purification',
+            'revitalizingPulse',
+            'summonStoneGolem',
+            'fortifyPosition'
+        ];
+        newSkillIds.forEach(id => {
+            for (let i = 0; i < 5; i++) {
+                this.addSkillById(id, 'NORMAL');
+            }
+        });
+
         // 나머지 스킬은 노멀 등급으로 10장씩 생성
+        const excludedSkills = new Set(['charge', 'attack', ...newSkillIds]);
         for (const skillId in skillCardDatabase) {
-            if (skillCardDatabase.hasOwnProperty(skillId) && skillId !== 'charge' && skillId !== 'attack') {
+            if (skillCardDatabase.hasOwnProperty(skillId) && !excludedSkills.has(skillId)) {
                 for (let i = 0; i < 10; i++) {
                     this.addSkillById(skillId, 'NORMAL');
                 }

@@ -285,10 +285,19 @@ class SkillEffectProcessor {
             return; // 열망 스킬은 데미지를 주지 않고 종료
         }
 
-        // ▼▼▼ [수정] 단일/광역 타겟 처리 로직 ▼▼▼
+        // ▼▼▼ [수정] 단일/광역/연쇄 타겟 처리 로직 ▼▼▼
         let finalTargets = [target];
 
-        if (skill.aoe) {
+        if (skill.maxTargets && skill.damageSequence) {
+            const others = this.battleSimulator.turnQueue
+                .filter(u => u.team !== unit.team && u.currentHp > 0 && u.uniqueId !== target.uniqueId)
+                .sort(
+                    (a, b) =>
+                        Math.abs(target.gridX - a.gridX) + Math.abs(target.gridY - a.gridY) -
+                        (Math.abs(target.gridX - b.gridX) + Math.abs(target.gridY - b.gridY))
+                );
+            finalTargets = [target, ...others.slice(0, skill.maxTargets - 1)];
+        } else if (skill.aoe) {
             const targetCellPos = { col: target.gridX, row: target.gridY };
             const affectedCells = areaOfEffectEngine.getAffectedCells(
                 skill.aoe.shape,
@@ -323,11 +332,14 @@ class SkillEffectProcessor {
                 spriteEngine.changeSpriteForDuration(target, 'hitted', 200);
             }
 
-            for (const currentTarget of finalTargets) {
+            for (const [index, currentTarget] of finalTargets.entries()) {
                 // 이미 죽은 대상은 더 이상 공격하지 않습니다.
                 if (currentTarget.currentHp <= 0) continue;
 
-                const finalSkillData = { ...skill };
+                const multiplier = skill.damageSequence
+                    ? skill.damageSequence[index] || skill.damageSequence[skill.damageSequence.length - 1]
+                    : skill.damageMultiplier;
+                const finalSkillData = { ...skill, damageMultiplier: multiplier };
 
                 const { damage: totalDamage, hitType, comboCount } = combatCalculationEngine.calculateDamage(
                     unit,
@@ -341,6 +353,7 @@ class SkillEffectProcessor {
                 const effects = statusEffectManager.activeEffects.get(currentTarget.uniqueId) || [];
                 const linkEffect = effects.find(e => e.id === 'linkProtocolBuff');
 
+                let hpDamage;
                 if (linkEffect && linkEffect.attackerId) {
                     const caster = this.battleSimulator.turnQueue.find(u => u.uniqueId === linkEffect.attackerId);
                     if (caster && caster.currentHp > 0) {
@@ -348,14 +361,19 @@ class SkillEffectProcessor {
                         const damageToCaster = totalDamage - damageToTarget;
 
                         this._applyDamage(caster, damageToCaster, '링크', '#9333ea');
-                        this._applyDamage(currentTarget, damageToTarget, hitType, '#ff4d4d');
+                        hpDamage = this._applyDamage(currentTarget, damageToTarget, hitType, '#ff4d4d');
                     } else {
                         // 시전자가 죽었으면 일반 피해 적용
-                        this._applyDamage(currentTarget, totalDamage, hitType);
+                        hpDamage = this._applyDamage(currentTarget, totalDamage, hitType);
                     }
                 } else {
                     // 버프가 없으면 일반 피해 적용
-                    this._applyDamage(currentTarget, totalDamage, hitType);
+                    hpDamage = this._applyDamage(currentTarget, totalDamage, hitType);
+                }
+                if (skill.lifeSteal && hpDamage > 0) {
+                    const healAmount = Math.round(hpDamage * skill.lifeSteal);
+                    unit.currentHp = Math.min(unit.finalStats.hp, unit.currentHp + healAmount);
+                    this.vfxManager.createDamageNumber(unit.sprite.x, unit.sprite.y, `+${healAmount}`, '#22c55e');
                 }
                 // ▲▲▲ [신규] 추가 완료 ▲▲▲
 
@@ -476,6 +494,7 @@ class SkillEffectProcessor {
                 }
             }
         }
+        return damageToHp;
     }
 
     async _processAidSkill(unit, target, skill) {

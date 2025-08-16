@@ -1,8 +1,8 @@
 // 신규 스킬 카드 모음
 // 이 파일은 추가로 생성된 다양한 유형의 스킬 카드를 정의합니다.
 
-import { EFFECT_TYPES } from './src/game/utils/EffectTypes.js';
-import { SKILL_TAGS } from './src/game/utils/SkillTagManager.js';
+import { EFFECT_TYPES } from '../../utils/EffectTypes.js';
+import { SKILL_TAGS } from '../../utils/SkillTagManager.js';
 
 // 액티브 스킬
 export const newActiveSkills = {
@@ -117,6 +117,7 @@ export const newActiveSkills = {
         }
     }
 };
+
 
 // 버프 스킬
 export const newBuffSkills = {
