@@ -13,7 +13,12 @@ import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 // 적이 없을 때는 가장 가까운 적을 찾아 공격하기 위해 사용됩니다.
 import FindTargetNode from '../nodes/FindTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
+import IsHealthBelowThresholdNode from '../nodes/IsHealthBelowThresholdNode.js';
 
+/**
+ * Improved HealerAI: 힐러 AI의 생존 본능을 강화한 버전입니다.
+ * 체력이 30% 이하일 때 안전한 위치로 후퇴하는 로직을 추가합니다.
+ */
 function createHealerAI(engines = {}) {
     // --- 공통 사용 브랜치 ---
     const executeSkillBranch = new SelectorNode([
@@ -52,15 +57,22 @@ function createHealerAI(engines = {}) {
             new MoveToTargetNode(engines)
         ])
     ]);
-    
-    // ... MBTI 기반 특수 행동 로직 (필요 시 여기에 추가) ...
 
+    // --- 생존 본능 분기 ---
+    const selfPreservationBranch = new SequenceNode([
+        new IsHealthBelowThresholdNode(0.30),
+        new HasNotMovedNode(),
+        new FindSafeRepositionNode(engines),
+        new MoveToTargetNode(engines)
+    ]);
+
+    // ... MBTI 기반 특수 행동 로직 (필요 시 여기에 추가) ...
 
     // --- 최종 행동 트리 구성 ---
     const rootNode = new SelectorNode([
-        // 1순위: 특수 행동 (예: 생존 본능)
-        // ...
-        
+        // 1순위: 체력이 낮을 때 후퇴
+        selfPreservationBranch,
+
         // 2순위: 기본 행동 (반드시 실행됨)
         basicActionBranch
     ]);
