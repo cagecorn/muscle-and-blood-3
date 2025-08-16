@@ -18,9 +18,9 @@ import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 import UseBuffSkillOrWaitNode from '../nodes/UseBuffSkillOrWaitNode.js';
 
 /**
- * MeleeAI: 근접 공격형 AI 행동 트리 (개선 버전)
+ * Improved MeleeAI: 근접 공격형 AI 행동 트리의 강화 버전
  * 우선순위:
- * 1. (생존) 체력이 35% 미만이면 안전한 위치로 후퇴합니다.
+ * 1. (생존) 체력이 25% 미만이면 안전한 위치로 후퇴합니다.
  * 2. (마무리) 공격 가능한 체력이 가장 낮은 적을 찾아 공격합니다.
  * 3. (전략) 우선순위 타겟(원거리/힐러)을 찾아 공격합니다.
  * 4. (기본) 위 모든 행동이 불가능할 경우, 가장 가까운 적을 공격합니다.
@@ -57,9 +57,9 @@ function createMeleeAI(engines = {}) {
     ]);
 
     const rootNode = new SelectorNode([
-        // 1순위: 생존 본능 (체력이 35% 미만일 때 후퇴)
+        // 1순위: 생존 본능 (체력이 25% 미만일 때 후퇴)
         new SequenceNode([
-            new IsHealthBelowThresholdNode(0.35),
+            new IsHealthBelowThresholdNode(0.25),
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),
             new MoveToTargetNode(engines)

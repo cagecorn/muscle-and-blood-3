@@ -16,6 +16,10 @@ import FindTargetNode from '../nodes/FindTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 import UseBuffSkillOrWaitNode from '../nodes/UseBuffSkillOrWaitNode.js';
 
+/**
+ * Improved RangedAI: 원거리 AI의 카이팅 및 행동 로직을 강화한 버전입니다.
+ * dangerZone 값을 2로 늘려 적이 2칸 이내에 접근하면 후퇴하도록 조정했습니다.
+ */
 function createRangedAI(engines = {}) {
     // --- 공통 사용 브랜치 ---
     const executeSkillBranch = new SelectorNode([
@@ -52,8 +56,8 @@ function createRangedAI(engines = {}) {
     // --- MBTI 기반 특수 행동들 ---
     const kitingBehavior = new SequenceNode([
         new HasNotMovedNode(),
-        // 적이 바로 인접했을 때만 "위협"으로 간주하도록 조건을 완화합니다.
-        new IsTargetTooCloseNode({ ...engines, dangerZone: 1 }),
+        // dangerZone 값을 2로 높여 원거리 AI가 더 먼 거리에서도 후퇴합니다.
+        new IsTargetTooCloseNode({ ...engines, dangerZone: 2 }),
         new FindKitingPositionNode(engines),
         new MoveToTargetNode(engines)
     ]);
