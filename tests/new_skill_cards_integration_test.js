@@ -29,5 +29,11 @@ newSkillIds.forEach(id => {
   assert(count >= 5, `${id} should be added to inventory at game start`);
 });
 
+assert.strictEqual(
+  skillCardDatabase.shadowStep.NORMAL.type,
+  'BUFF',
+  'shadowStep should be registered as a buff skill'
+);
+
 console.log('--- New skill cards integration test passed ---');
 

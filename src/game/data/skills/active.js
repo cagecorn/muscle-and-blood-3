@@ -113,6 +113,7 @@ export const activeSkills = {
             illustrationPath: null,
             cooldown: 3,
             range: 0,
+            damageMultiplier: 0,
             aoe: { shape: 'SQUARE', radius: 3 },
             effect: {
                 id: 'tauntDebuff',

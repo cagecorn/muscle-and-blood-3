@@ -73,6 +73,7 @@ console.log('✅ 클래스 패시브 테스트 통과');
 const tauntSkill = activeSkills.taunt.NORMAL;
 assert(tauntSkill && tauntSkill.cooldown === 3, '도발 스킬의 기본 쿨타임이 3이어야 합니다.');
 assert(tauntSkill.selfEffect && tauntSkill.selfEffect.modifiers.stat === 'physicalDefense', '도발 스킬은 방어력 증가 효과를 가져야 합니다.');
+assert.strictEqual(tauntSkill.damageMultiplier, 0, '도발 스킬은 데미지를 주지 않아야 합니다.');
 
 const shieldBashSkill = activeSkills.shieldBash.NORMAL;
 assert(shieldBashSkill && shieldBashSkill.range === 1, '방패 치기 스킬의 사거리는 1이어야 합니다.');
