@@ -54,28 +54,6 @@ export const newActiveSkills = {
         }
     },
 
-    // 그림자 이동: 위치 이동 및 다음 공격 강화
-    shadowStep: {
-        yinYangValue: -1,
-        NORMAL: {
-            id: 'shadowStep',
-            name: '그림자 이동',
-            type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.DARK, SKILL_TAGS.SPECIAL],
-            cost: 1,
-            targetType: 'self',
-            description: '그림자 속으로 숨어 순간이동합니다. 지정한 위치(최대 3칸)로 이동하며 다음 공격이 20% 증가합니다.',
-            illustrationPath: null,
-            cooldown: 2,
-            range: 3,
-            effect: {
-                id: 'shadowStepBuff',
-                type: EFFECT_TYPES.BUFF,
-                duration: 1,
-                modifiers: { stat: 'physicalAttack', type: 'percentage', value: 0.20 }
-            }
-        }
-    },
 
     // 연쇄 번개: 여러 대상을 연쇄적으로 공격
     chainLightning: {
@@ -171,6 +149,29 @@ export const newBuffSkills = {
                     { stat: 'movement', type: 'flat', value: 2 },
                     { stat: 'evasion', type: 'percentage', value: 0.10 }
                 ]
+            }
+        }
+    },
+
+    // 그림자 이동: 위치 이동 및 다음 공격 강화
+    shadowStep: {
+        yinYangValue: -1,
+        NORMAL: {
+            id: 'shadowStep',
+            name: '그림자 이동',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.DARK, SKILL_TAGS.SPECIAL],
+            cost: 1,
+            targetType: 'self',
+            description: '그림자 속으로 숨어 순간이동합니다. 지정한 위치(최대 3칸)로 이동하며 다음 공격이 20% 증가합니다.',
+            illustrationPath: null,
+            cooldown: 2,
+            range: 3,
+            effect: {
+                id: 'shadowStepBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 1,
+                modifiers: { stat: 'physicalAttack', type: 'percentage', value: 0.20 }
             }
         }
     },

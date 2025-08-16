@@ -169,6 +169,7 @@ combatCalculationEngine.battleSimulator = battleSimulator;
 
 // -------------------- Commander - Commander's Shout --------------------
 {
+  assert.strictEqual(mercenaryData.commander.baseStats.attackRange, 2, 'Commander attack range should be 2');
   const commander = { uniqueId:1, id:'commander', instanceName:'Cmd', team:'ally' };
   const strategySkill = { id:'tactics', name:'Tactics', cost:0, cooldown:10, tags:[SKILL_TAGS.STRATEGY] };
   skillEngine.recordSkillUse(commander, strategySkill);

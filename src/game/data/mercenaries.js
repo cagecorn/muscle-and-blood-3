@@ -231,7 +231,7 @@ export const mercenaryData = {
         baseStats: {
             hp: 110, valor: 12, strength: 13, endurance: 11,
             agility: 9, intelligence: 7, wisdom: 8, luck: 7,
-            attackRange: 1,
+            attackRange: 2,
             movement: 3,
             weight: 18
         },
