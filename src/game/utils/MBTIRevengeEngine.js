@@ -33,7 +33,7 @@ class MBTIRevengeEngine {
       const aspiration = aspirationData?.aspiration ?? 0;
       if (distance <= range && aspiration >= 10) {
         aspirationEngine.addAspiration(ally.uniqueId, -10, '리벤지 어택');
-        const revengeSkill = { id: 'mbtiRevenge', name: '리벤지 어택', type: 'ACTIVE', damageMultiplier: 1 };
+        const revengeSkill = { id: 'mbtiRevenge', name: '리벤지 어택', type: 'ACTIVE', damageMultiplier: 0.5 };
         const { damage, hitType } = combatCalculationEngine.calculateDamage(ally, attacker, revengeSkill);
 
         if (ally.sprite && attacker.sprite) {
