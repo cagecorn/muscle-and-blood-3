@@ -17,7 +17,7 @@ class FindSafeHealingPositionNode extends Node {
         debugAIManager.logNodeEvaluation(this, unit);
         const targetAlly = blackboard.get('skillTarget');
         const enemies = blackboard.get('enemyUnits');
-        const healRange = blackboard.get('currentSkillData')?.range || 2;
+        const healRange = blackboard.get('currentSkillData')?.range ?? 2;
 
         if (!targetAlly) {
             debugAIManager.logNodeResult(NodeState.FAILURE, '치유 대상 아군 없음');

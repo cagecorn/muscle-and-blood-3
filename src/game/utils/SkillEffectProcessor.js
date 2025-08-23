@@ -506,6 +506,14 @@ class SkillEffectProcessor {
         return damageToHp;
     }
 
+    applyStatusEffectDamage(attacker, target, damage, damageType) {
+        const hpDamage = this._applyDamage(target, damage, damageType, '#9333ea');
+        if (target.currentHp <= 0) {
+            this.terminationManager.handleUnitDeath(target, attacker);
+        }
+        return hpDamage;
+    }
+
     async _processAidSkill(unit, target, skill) {
         spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
 
