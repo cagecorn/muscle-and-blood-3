@@ -9,6 +9,8 @@ import { attributeSpecializations } from '../data/attributeSpecializations.js';
 import { diceEngine } from './DiceEngine.js';
 // ✨ [추가] 아키타입 결정 엔진을 가져옵니다.
 import { archetypeAssignmentEngine } from './ArchetypeAssignmentEngine.js';
+// MBTI 매핑을 불러옵니다.
+import { CLASS_MBTI_MAP, mbtiFromString } from '../data/classMbtiMap.js';
 
 /**
  * 용병의 생성, 저장, 관리를 전담하는 엔진 (싱글턴)
@@ -25,11 +27,15 @@ class MercenaryEngine {
      * MBTI 성향 점수를 생성합니다.
      * @returns {object} - 각 MBTI 축에 대한 점수
      */
-    _generateMBTI() {
+    _generateMBTI(classId) {
+        const mbtiString = CLASS_MBTI_MAP[classId];
+        if (mbtiString) {
+            return mbtiFromString(mbtiString);
+        }
         const traits = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
-        const axes = [ ['E','I'], ['S','N'], ['T','F'], ['J','P'] ];
+        const axes = [['E','I'],['S','N'],['T','F'],['J','P']];
         axes.forEach(axis => {
-            const score = Math.floor(Math.random() * 101); // 0-100
+            const score = Math.floor(Math.random() * 101);
             traits[axis[0]] = score;
             traits[axis[1]] = 100 - score;
         });
@@ -55,8 +61,8 @@ class MercenaryEngine {
             equippedItems: [],
             // ✨ 모든 용병이 동일한 형태의 스킬 슬롯을 갖도록 초기화합니다.
             skillSlots: [null, null, null, null, null, null, null, null],
-            // ✨ 각 용병은 고유한 MBTI 성향을 가집니다.
-            mbti: this._generateMBTI()
+            // ✨ 클래스별 고정 MBTI 성향을 적용합니다.
+            mbti: this._generateMBTI(baseMercenaryData.id)
         };
 
         // ✨ [핵심 추가] 용병 생성 직후 아키타입을 결정합니다.
