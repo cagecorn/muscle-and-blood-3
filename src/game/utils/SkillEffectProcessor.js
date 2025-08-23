@@ -471,6 +471,11 @@ class SkillEffectProcessor {
             this.vfxManager.createDamageNumber(unit.sprite.x, unit.sprite.y - 10, `+${healAmount}`, '#ffd700', '배리어');
         }
 
+        // 적에게 피해를 준 공격 스킬 사용 시 열망 5 상승
+        if (finalTargets.length > 0) {
+            aspirationEngine.addAspiration(unit.uniqueId, 5, '공격 스킬 사용');
+        }
+
     }
 
     // --- [신규] 피해 적용 로직을 별도 메서드로 추출 ---

@@ -56,16 +56,7 @@ class AspirationEngine {
             debugAspirationManager.logAspirationChange(unitId, unitName, oldAspiration, newAspiration, amount, reason);
         }
 
-        // 상태 변화 체크
-        if (data.aspiration >= 100) {
-            data.state = ASPIRATION_STATE.EXALTED;
-            const unit = this.battleSimulator.turnQueue.find(u => u.uniqueId === unitId);
-            if (unit) {
-                this._applyExaltedBuffs(unit);
-                debugAspirationManager.logStateChange(unit.instanceName, ASPIRATION_STATE.EXALTED);
-            }
-        }
-        // ✨ [수정] 열망 붕괴 로직을 삭제했습니다.
+        // 더 이상 특정 수치 도달에 따른 상태 변화는 발생하지 않습니다.
     }
 
     _applyExaltedBuffs(unit) {

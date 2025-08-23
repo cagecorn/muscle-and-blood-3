@@ -33,7 +33,7 @@ class MBTIChainAttackEngine {
       const aspiration = aspirationData?.aspiration ?? 0;
       if (distance <= range && aspiration >= 10) {
         aspirationEngine.addAspiration(ally.uniqueId, -10, '체인 어택');
-        const chainSkill = { id: 'mbtiChain', name: '체인 어택', type: 'ACTIVE', damageMultiplier: 1 };
+        const chainSkill = { id: 'mbtiChain', name: '체인 어택', type: 'ACTIVE', damageMultiplier: 0.5 };
         const { damage, hitType } = combatCalculationEngine.calculateDamage(ally, defender, chainSkill);
 
         if (ally.sprite && defender.sprite) {
