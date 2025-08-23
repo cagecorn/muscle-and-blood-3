@@ -2,6 +2,7 @@ import { getMbtiCompatibility } from '../data/mbtiCompatibility.js';
 import { aspirationEngine } from './AspirationEngine.js';
 import { combatCalculationEngine } from './CombatCalculationEngine.js';
 import { mbtiToString } from '../data/classMbtiMap.js';
+import { spriteEngine } from './SpriteEngine.js';
 
 class MBTIRevengeEngine {
   constructor() {
@@ -34,6 +35,12 @@ class MBTIRevengeEngine {
         aspirationEngine.addAspiration(ally.uniqueId, -10, '리벤지 어택');
         const revengeSkill = { id: 'mbtiRevenge', name: '리벤지 어택', type: 'ACTIVE', damageMultiplier: 1 };
         const { damage, hitType } = combatCalculationEngine.calculateDamage(ally, attacker, revengeSkill);
+
+        if (ally.sprite && attacker.sprite) {
+          spriteEngine.changeSpriteForDuration(ally, 'attack', 600);
+          this.battleSimulator.animationEngine?.attack(ally.sprite, attacker.sprite);
+        }
+
         this.battleSimulator.skillEffectProcessor._applyDamage(attacker, damage, hitType);
         this.battleSimulator.noticeUI?.show('Revenge Attack!');
       }

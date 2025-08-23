@@ -17,6 +17,7 @@ const defender = {
   currentBarrier: 0,
   gridX: 0,
   gridY: 0,
+  sprite: { x: 0, y: 0 },
 };
 
 const ally = {
@@ -28,6 +29,7 @@ const ally = {
   currentBarrier: 0,
   gridX: 1,
   gridY: 0,
+  sprite: { x: 1, y: 0 },
 };
 
 const attacker = {
@@ -39,11 +41,18 @@ const attacker = {
   currentBarrier: 0,
   gridX: 1,
   gridY: 1,
+  sprite: { x: 1, y: 1 },
 };
 
 // Battle simulator stub
+let animationCalled = false;
 const battleSimulator = {
   turnQueue: [defender, ally, attacker],
+  animationEngine: {
+    attack() {
+      animationCalled = true;
+    }
+  },
   skillEffectProcessor: {
     _applyDamage(target, damage) {
       target.currentHp -= damage;
@@ -62,5 +71,6 @@ const afterAsp = aspirationEngine.getAspirationData(ally.uniqueId).aspiration;
 
 assert.strictEqual(afterAsp, beforeAsp - 10, 'Aspiration should decrease by 10');
 assert(attacker.currentHp < 100, 'Attacker should take damage');
+assert(animationCalled, 'Animation should trigger');
 
 console.log('MBTI Revenge Engine test passed');
