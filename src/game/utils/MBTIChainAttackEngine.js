@@ -3,6 +3,7 @@ import { aspirationEngine } from './AspirationEngine.js';
 import { combatCalculationEngine } from './CombatCalculationEngine.js';
 import { mbtiToString } from '../data/classMbtiMap.js';
 import { spriteEngine } from './SpriteEngine.js';
+import { debugChainRevengeManager } from '../debug/DebugChainRevengeManager.js';
 
 class MBTIChainAttackEngine {
   constructor() {
@@ -43,6 +44,7 @@ class MBTIChainAttackEngine {
 
         this.battleSimulator.skillEffectProcessor._applyDamage(defender, damage, hitType);
         this.battleSimulator.noticeUI?.show('Chain Attack!');
+        debugChainRevengeManager.logChainAttack(ally, attacker, defender, damage, hitType);
       }
     });
   }
