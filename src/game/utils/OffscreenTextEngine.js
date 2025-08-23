@@ -15,15 +15,17 @@ export class OffscreenTextEngine {
      * \uc9c0\uc815\ub41c \uc2a4\ud504\ub808\uc774\ud2b8 \uc704\uc5d0 \uc774\ub984\ud3a0\ub97c \uc0dd\uc131\ud569\ub2c8\ub2e4.
      * @param {Phaser.GameObjects.Sprite} sprite \uc774\ub984\ud3a0\uc774 \ub530\ub77c\ub2e4\ub2d0 \ub300\uc0c1 \uc2a4\ud504\ub808\uc774\ud2b8
      * @param {string} text \ud45c\uc2dc\ud560 \ud14d\uc2a4\ud2b8
-     * @param {string} color \ud14d\uc2a4\ud2b8 \uc0c9\uc0c1
+     * @param {string} bgColor \ubc30\uacbd \uc0c9\uc0c1
      */
-    createLabel(sprite, text, color = '#ffffff') {
+    createLabel(sprite, text, bgColor = 'rgba(255,255,255,0.5)') {
         const label = this.scene.add.text(sprite.x, sprite.y, text, {
             fontFamily: '"Arial Black", Arial, sans-serif',
-            fontSize: '28px', // 2\ubc88 \ud06c\uae30\ub85c \ud3f0\ud2b8 \uc124\uc815
-            color: color,
+            fontSize: '28px',
+            color: '#ffffff',
             stroke: '#000000',
             strokeThickness: 5,
+            backgroundColor: bgColor,
+            padding: { x: 6, y: 2 },
         });
 
         // 이름표가 캐릭터의 머리 위에 위치하도록 기준점을 중간 하단으로 설정합니다.
@@ -31,8 +33,8 @@ export class OffscreenTextEngine {
         label.setResolution(2);  // 해상도를 2배로 설정
         label.setScale(0.5);     // \ud06c\uae30\ub97c 0.5\ubc84\ub2e4\ub97c \ucd95\uc18c\ud558\uc5ec \uc120\uba85\ub3c4 \ud655\ub960
 
-        // ✨ 유닛 머리 위와의 여백을 더 확보하여 토큰과 바 영역을 만듭니다.
-        label.y = sprite.y - (sprite.displayHeight / 2) - 15;
+        // ✨ 유닛 머리 위에 충분한 공간을 확보하여 각종 바가 배치될 수 있도록 합니다.
+        label.y = sprite.y - (sprite.displayHeight / 2) - 30;
 
         this.labels.push({ label, sprite });
         return label;
@@ -46,8 +48,8 @@ export class OffscreenTextEngine {
         this.labels.forEach(item => {
             if (item.sprite.active) {
                 item.label.x = item.sprite.x;
-                // ✨ 여백 값을 동일하게 조정해 다른 UI와 간섭하지 않도록 합니다.
-                item.label.y = item.sprite.y - (item.sprite.displayHeight / 2) - 15;
+                // ✨ 이름표 위치를 고정하여 전투 중에도 안정적으로 표시되게 합니다.
+                item.label.y = item.sprite.y - (item.sprite.displayHeight / 2) - 30;
             } else {
                 // \uc2a4\ud504\ub808\uc774\ud2b8\uac00 \ube44\ud65c\uc131\ud654\ub418\uba74 \uc774\ub984\ud3a0\ub3c4 \uc228\uae38\ub9ac\ub2c8\ub2e4.
                 item.label.setVisible(false);

@@ -29,14 +29,14 @@ export class IconManager {
 
         // 버프 아이콘을 위한 컨테이너 (유닛 왼쪽)
         const buffsContainer = this.scene.add.container(
-            parentSprite.x - parentSprite.displayWidth / 2 - 15,
+            parentSprite.x - parentSprite.displayWidth / 2 + 10,
             parentSprite.y
         );
         this.vfxLayer.add(buffsContainer);
 
         // 디버프 아이콘을 위한 컨테이너 (유닛 오른쪽)
         const debuffsContainer = this.scene.add.container(
-            parentSprite.x + parentSprite.displayWidth / 2 + 15,
+            parentSprite.x + parentSprite.displayWidth / 2 - 10,
             parentSprite.y
         );
         this.vfxLayer.add(debuffsContainer);

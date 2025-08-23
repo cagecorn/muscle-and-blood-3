@@ -205,11 +205,8 @@ export class BattleSimulatorEngine {
         // 스킬 사용 기록 초기화
         skillEngine.resetTurnActions();
 
-        // [✨ 수정] 첫 턴 시작 직후 모든 유닛의 토큰 UI를 업데이트합니다.
+        // 첫 턴 시작 직후 모든 유닛의 상태 UI를 업데이트합니다.
         allUnits.forEach(unit => {
-            const bound = this.bindingManager.bindings.get(unit.sprite) || [];
-            const nameTag = bound.find(el => el.type === 'Text');
-            this.vfxManager.updateTokenDisplay(unit, nameTag);
             this.vfxManager.updateHealthBar(unit.uniqueId, unit.currentHp, unit.finalStats.hp);
             this.vfxManager.updateAspirationBar(unit.uniqueId);
             this.vfxManager.iconManager.updateIconsForUnit(unit.uniqueId);
@@ -246,9 +243,9 @@ export class BattleSimulatorEngine {
                 unit.gridY = cell.row;
             }
 
-            // ✨ 팀에 따라 이름표 색상을 다르게 설정합니다.
-            const nameColor = unit.team === 'ally' ? '#60a5fa' : '#f87171';
-            const nameTag = this.textEngine.createLabel(unit.sprite, unit.instanceName, nameColor);
+            // ✨ 팀에 따라 이름표 배경색을 다르게 설정합니다.
+            const nameBgColor = unit.team === 'ally' ? 'rgba(59,130,246,0.8)' : 'rgba(239,68,68,0.8)';
+            const nameTag = this.textEngine.createLabel(unit.sprite, unit.instanceName, nameBgColor);
 
             // 그림자 생성
             const shadow = this.shadowManager.createShadow(unit.sprite);
@@ -335,9 +332,6 @@ export class BattleSimulatorEngine {
             // --- ✨ 매 행동 후 모든 유닛의 UI를 갱신합니다. ---
             this.turnQueue.forEach(unit => {
                 if (unit.sprite && unit.sprite.active) {
-                    const bound = this.bindingManager.bindings.get(unit.sprite) || [];
-                    const nameTag = bound.find(el => el.type === 'Text');
-                    this.vfxManager.updateTokenDisplay(unit, nameTag);
                     this.vfxManager.updateHealthBar(unit.uniqueId, unit.currentHp, unit.finalStats.hp);
                     this.vfxManager.updateAspirationBar(unit.uniqueId);
                     this.vfxManager.iconManager.updateIconsForUnit(unit.uniqueId);
