@@ -2,6 +2,7 @@ import { getMbtiCompatibility } from '../data/mbtiCompatibility.js';
 import { aspirationEngine } from './AspirationEngine.js';
 import { combatCalculationEngine } from './CombatCalculationEngine.js';
 import { mbtiToString } from '../data/classMbtiMap.js';
+import { spriteEngine } from './SpriteEngine.js';
 
 class MBTIChainAttackEngine {
   constructor() {
@@ -34,6 +35,12 @@ class MBTIChainAttackEngine {
         aspirationEngine.addAspiration(ally.uniqueId, -10, '체인 어택');
         const chainSkill = { id: 'mbtiChain', name: '체인 어택', type: 'ACTIVE', damageMultiplier: 1 };
         const { damage, hitType } = combatCalculationEngine.calculateDamage(ally, defender, chainSkill);
+
+        if (ally.sprite && defender.sprite) {
+          spriteEngine.changeSpriteForDuration(ally, 'attack', 600);
+          this.battleSimulator.animationEngine?.attack(ally.sprite, defender.sprite);
+        }
+
         this.battleSimulator.skillEffectProcessor._applyDamage(defender, damage, hitType);
         this.battleSimulator.noticeUI?.show('Chain Attack!');
       }

@@ -28,6 +28,7 @@ const ally = {
   currentBarrier: 0,
   gridX: 1,
   gridY: 0,
+  sprite: { x: 1, y: 0 },
 };
 
 const defender = {
@@ -39,11 +40,18 @@ const defender = {
   currentBarrier: 0,
   gridX: 1,
   gridY: 1,
+  sprite: { x: 1, y: 1 },
 };
 
 // Battle simulator stub
+let animationCalled = false;
 const battleSimulator = {
   turnQueue: [attacker, ally, defender],
+  animationEngine: {
+    attack() {
+      animationCalled = true;
+    }
+  },
   skillEffectProcessor: {
     _applyDamage(target, damage) {
       target.currentHp -= damage;
@@ -62,5 +70,6 @@ const afterAsp = aspirationEngine.getAspirationData(ally.uniqueId).aspiration;
 
 assert.strictEqual(afterAsp, beforeAsp - 10, 'Aspiration should decrease by 10');
 assert(defender.currentHp < 100, 'Defender should take damage');
+assert(animationCalled, 'Animation should trigger');
 
 console.log('MBTI Chain Attack Engine test passed');
