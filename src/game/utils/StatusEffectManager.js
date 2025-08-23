@@ -102,13 +102,8 @@ class StatusEffectManager {
                     // ✨ --- 추가 완료 --- ✨
 
                     if (damage > 0) {
-                        unit.currentHp -= damage;
-                        if (this.battleSimulator.vfxManager) {
-                            this.battleSimulator.vfxManager.createDamageNumber(unit.sprite.x, unit.sprite.y, damage, '#9333ea', damageType);
-                        }
-                        if (unit.currentHp <= 0) {
-                            this.battleSimulator.terminationManager.handleUnitDeath(unit);
-                        }
+                        const caster = effect.attackerId ? this.findUnitById(effect.attackerId) : null;
+                        this.battleSimulator.skillEffectProcessor.applyStatusEffectDamage(caster, unit, damage, damageType);
                     }
                 });
 

@@ -29,7 +29,7 @@ class FindLowestHealthAllyNode extends Node {
 
         let potentialTargets = allies;
         if (this.inRangeOnly) {
-            const healRange = blackboard.get('currentSkillData')?.range || 2;
+            const healRange = blackboard.get('currentSkillData')?.range ?? 2;
             potentialTargets = allies.filter(a => {
                 const dist = Math.abs(unit.gridX - a.gridX) + Math.abs(unit.gridY - a.gridY);
                 return dist <= healRange;
