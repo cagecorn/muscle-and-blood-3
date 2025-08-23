@@ -1,6 +1,4 @@
 import { debugLogEngine } from './DebugLogEngine.js';
-// tokenEngine을 import하여 현재 토큰 개수를 가져옵니다.
-import { tokenEngine } from './TokenEngine.js';
 import { comboManager } from './ComboManager.js';
 // ✨ 열망 엔진을 import하여 열망 수치를 가져옵니다.
 import { aspirationEngine, ASPIRATION_STATE } from './AspirationEngine.js';
@@ -19,8 +17,6 @@ export class VFXManager {
         this.vfxLayer = this.scene.add.layer().setDepth(100);
         this.iconManager = new IconManager(scene, this.vfxLayer); // IconManager 인스턴스 생성
 
-        // key: unitId, value: { container, tokens: [] }
-        this.activeTokenDisplays = new Map();
         // ✨ 체력/배리어/열망 바 객체를 저장합니다.
         this.unitBars = new Map();
 
@@ -79,114 +75,60 @@ export class VFXManager {
      */
     setupUnitVFX(unit, nameTag) {
         const unitId = unit.uniqueId;
-        // ✨ 2. 체력/열망바 너비를 절반으로 줄입니다.
-        const barWidth = 4;
-        const barHeight = 80;
-        // 기존에는 바가 스프라이트 바깥쪽에 위치했으나, 보다 밀착된 UI를 위해
-        // 스프라이트 내부로 10px 들여보냅니다.
-        const xOffset = unit.sprite.displayWidth / 2 - 10;
-        const healthYOffset = 25;
-        const aspirationYOffset = 15;
+        const sprite = unit.sprite;
+        const width = sprite.displayWidth;
 
-        // 1. 체력 및 배리어 바 생성 (유닛 왼쪽)
-        // ✨ 2. 투명도를 50%로 설정합니다.
-        const healthBar = this.createVerticalBar(unit.sprite, -xOffset, barHeight, barWidth, 0x282c34, 0x22c55e, 0.5, healthYOffset);
-        const barrierBar = this.createVerticalBar(unit.sprite, -xOffset, barHeight, barWidth, 0x282c34, 0xffd700, 0.5, healthYOffset);
+        const hpHeight = 6;
+        const barrierHeight = 4;
+        const aspirationHeight = 4;
+        const gap = 2;
+        const baseOffset = 4;
 
-        // 2. 열망 게이지 생성 (유닛 오른쪽)
-        // ✨ 2. 투명도를 50%로 설정합니다.
-        const aspirationBar = this.createVerticalBar(unit.sprite, xOffset, barHeight, barWidth, 0x282c34, 0x8b5cf6, 0.5, aspirationYOffset);
+        const aspirationOffset = baseOffset + aspirationHeight / 2;
+        const hpOffset = aspirationOffset + aspirationHeight / 2 + gap + hpHeight / 2;
+        const barrierOffset = hpOffset + hpHeight / 2 + gap + barrierHeight / 2;
+
+        const aspirationBar = this.createHorizontalBar(sprite, width, aspirationHeight, 0x282c34, 0x8b5cf6, aspirationOffset);
+        const healthBar = this.createHorizontalBar(sprite, width, hpHeight, 0x282c34, 0x22c55e, hpOffset);
+        const barrierBar = this.createHorizontalBar(sprite, width, barrierHeight, 0x282c34, 0xffd700, barrierOffset);
 
         this.unitBars.set(unitId, { healthBar, barrierBar, aspirationBar });
 
-        // 3. 토큰 디스플레이 초기화
-        this.updateTokenDisplay(unit, nameTag);
-        const tokenDisplay = this.activeTokenDisplays.get(unitId);
+        // 아이콘 디스플레이 생성 및 바인딩
+        const iconContainers = this.iconManager.createIconDisplay(sprite);
 
-        // 4. 아이콘 디스플레이 생성 및 바인딩
-        const iconContainers = this.iconManager.createIconDisplay(unit.sprite);
-
-        // 5. 생성된 모든 UI 요소를 유닛 스프라이트에 바인딩
-        this.bindingManager.bind(unit.sprite, [
+        // 생성된 모든 UI 요소를 유닛 스프라이트에 바인딩
+        this.bindingManager.bind(sprite, [
             nameTag,
             healthBar.container,
             barrierBar.container,
             aspirationBar.container,
-            tokenDisplay.container,
             iconContainers.buffsContainer,
             iconContainers.debuffsContainer,
         ]);
     }
 
     /**
-     * [✨ 신규 추가]
-     * 특정 유닛의 토큰 개수에 맞춰 화면에 토큰 아이콘을 업데이트합니다.
-     * @param {object} unit - 대상 유닛
-     */
-    updateTokenDisplay(unit, nameTag) {
-        if (!unit || !unit.sprite || !unit.sprite.active) return;
-
-        const unitId = unit.uniqueId;
-        let display = this.activeTokenDisplays.get(unitId);
-
-        // 유닛의 토큰 UI가 없다면 새로 생성합니다.
-        if (!display) {
-            const nameTagWidth = nameTag.width * nameTag.scaleX;
-            const offsetX = nameTagWidth / 2 + 5;
-            const offsetY = nameTag.y - unit.sprite.y;
-
-            const container = this.scene.add.container(unit.sprite.x + offsetX, unit.sprite.y + offsetY);
-            this.vfxLayer.add(container);
-            this.bindingManager.bind(unit.sprite, [container]);
-
-            display = { container, tokens: [] };
-            this.activeTokenDisplays.set(unitId, display);
-        } else {
-            const nameTagWidth = nameTag.width * nameTag.scaleX;
-            const offsetX = nameTagWidth / 2 + 5;
-            const offsetY = nameTag.y - unit.sprite.y;
-            display.container.setData('offsetX', offsetX);
-            display.container.setData('offsetY', offsetY);
-        }
-
-        const tokenCount = tokenEngine.getTokens(unitId);
-
-        // 토큰 개수에 변화가 없으면 업데이트하지 않습니다.
-        if (display.tokens.length === tokenCount) return;
-
-        // 기존 토큰 아이콘들을 모두 제거합니다.
-        display.tokens.forEach(token => token.destroy());
-        display.tokens = [];
-
-        const tokenOverlap = 10;
-        for (let i = 0; i < tokenCount; i++) {
-            const tokenImage = this.scene.add.image(i * tokenOverlap, 0, 'token').setScale(0.04);
-            display.container.add(tokenImage);
-            display.tokens.push(tokenImage);
-        }
-    }
-
-    /**
-     * 얇은 세로 바 UI를 생성합니다.
+     * 얇은 가로 바 UI를 생성합니다.
      * @param {Phaser.GameObjects.Sprite} parentSprite - 위치 기준 스프라이트
-     * @param {number} xOffset - parentSprite 중심으로부터의 x축 거리
-     * @param {number} height - 바의 최대 높이
-     * @param {number} width - 바의 너비
+     * @param {number} width - 바의 최대 너비
+     * @param {number} height - 바의 높이
      * @param {number} bgColor - 배경색
      * @param {number} barColor - 전경색
+     * @param {number} yOffset - 스프라이트 위로부터의 거리
      * @param {number} bgAlpha - 배경 투명도 (기본값 0.7)
      * @returns {{container: Phaser.GameObjects.Container, bar: Phaser.GameObjects.Graphics}}
      */
-    createVerticalBar(parentSprite, xOffset, height, width, bgColor, barColor, bgAlpha = 0.7, yOffset = 0) {
-        const container = this.scene.add.container(parentSprite.x + xOffset, parentSprite.y - yOffset);
+    createHorizontalBar(parentSprite, width, height, bgColor, barColor, yOffset, bgAlpha = 0.7) {
+        const container = this.scene.add.container(parentSprite.x, parentSprite.y - parentSprite.displayHeight / 2 - yOffset);
         this.vfxLayer.add(container);
 
         const bg = this.scene.add.graphics().fillStyle(bgColor, bgAlpha).fillRect(-width / 2, -height / 2, width, height);
-        // ✨ 2. 게이지 자체도 반투명하게 설정합니다.
-        const bar = this.scene.add.graphics().fillStyle(barColor, 0.5).fillRect(-width / 2, -height / 2, width, height);
+        const bar = this.scene.add.graphics().fillStyle(barColor, 0.8).fillRect(-width / 2, -height / 2, width, height);
 
         container.add([bg, bar]);
-        bar.setData('fullHeight', height); // 최대 높이 저장
+        bar.setData('fullWidth', width);
+        bar.setData('height', height);
 
         return { container, bar };
     }
@@ -203,17 +145,16 @@ export class VFXManager {
         if (!bars || !bars.healthBar) return;
 
         const ratio = (maxHp > 0) ? Math.max(0, Math.min(1, currentHp / maxHp)) : 0;
-        const fullHeight = bars.healthBar.bar.getData('fullHeight');
+        const fullWidth = bars.healthBar.bar.getData('fullWidth');
+        const height = bars.healthBar.bar.getData('height');
+        bars.healthBar.bar.clear().fillStyle(0x22c55e, 0.8).fillRect(-fullWidth / 2, -height / 2, fullWidth * ratio, height);
 
-        // ✨ 2. 게이지 너비를 얇게 고정합니다.
-        bars.healthBar.bar.clear().fillStyle(0x22c55e, 0.5).fillRect(-2, -fullHeight / 2, 4, fullHeight * ratio);
-
-        // 배리어 업데이트
         const unit = this.battleSimulator.turnQueue.find(u => u.uniqueId === unitId);
         if (unit) {
             const barrierRatio = (unit.maxBarrier > 0) ? Math.max(0, Math.min(1, unit.currentBarrier / unit.maxBarrier)) : 0;
-            // ✨ 2. 게이지 너비를 얇게 고정합니다.
-            bars.barrierBar.bar.clear().fillStyle(0xffd700, 0.5).fillRect(-2, -fullHeight / 2, 4, fullHeight * barrierRatio);
+            const bFullWidth = bars.barrierBar.bar.getData('fullWidth');
+            const bHeight = bars.barrierBar.bar.getData('height');
+            bars.barrierBar.bar.clear().fillStyle(0xffd700, 0.8).fillRect(-bFullWidth / 2, -bHeight / 2, bFullWidth * barrierRatio, bHeight);
         }
     }
 
@@ -223,7 +164,8 @@ export class VFXManager {
 
         const data = aspirationEngine.getAspirationData(unitId);
         const ratio = data.aspiration / 100;
-        const fullHeight = bars.aspirationBar.bar.getData('fullHeight');
+        const fullWidth = bars.aspirationBar.bar.getData('fullWidth');
+        const height = bars.aspirationBar.bar.getData('height');
         const aspirationBarPhaser = bars.aspirationBar.bar;
 
         // Clear previous tween
@@ -234,8 +176,8 @@ export class VFXManager {
 
         aspirationBarPhaser
             .clear()
-            .fillStyle(0x8b5cf6, 0.5)
-            .fillRect(-2, -fullHeight / 2, 4, fullHeight * ratio); // Reset to default
+            .fillStyle(0x8b5cf6, 0.8)
+            .fillRect(-fullWidth / 2, -height / 2, fullWidth * ratio, height); // Reset to default
 
         if (data.state === ASPIRATION_STATE.EXALTED) {
             // Full aspiration: bright purple glow
@@ -249,8 +191,8 @@ export class VFXManager {
                     const alpha = tween.getValue();
                     aspirationBarPhaser
                         .clear()
-                        .fillStyle(0xc084fc, 0.5 + alpha * 0.5)
-                        .fillRect(-2, -fullHeight / 2, 4, fullHeight * ratio);
+                        .fillStyle(0xc084fc, 0.8 + alpha * 0.5)
+                        .fillRect(-fullWidth / 2, -height / 2, fullWidth * ratio, height);
                 },
             });
         } else if (data.state === ASPIRATION_STATE.COLLAPSED) {
@@ -265,8 +207,8 @@ export class VFXManager {
                     const alpha = tween.getValue();
                     aspirationBarPhaser
                         .clear()
-                        .fillStyle(0xfb7171, 0.5 + alpha * 0.5)
-                        .fillRect(-2, -fullHeight / 2, 4, fullHeight * ratio);
+                        .fillStyle(0xfb7171, 0.8 + alpha * 0.5)
+                        .fillRect(-fullWidth / 2, -height / 2, fullWidth * ratio, height);
                 },
             });
         }
@@ -481,10 +423,6 @@ export class VFXManager {
      */
     shutdown() {
         this.vfxLayer.destroy();
-        this.activeTokenDisplays.forEach(display => {
-            display.container.destroy();
-        });
-        this.activeTokenDisplays.clear();
         this.unitBars.forEach(bars => {
             if (bars.healthBar.bar.currentTween) {
                 bars.healthBar.bar.currentTween.stop();
