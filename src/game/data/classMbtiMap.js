@@ -29,3 +29,16 @@ export function mbtiFromString(mbtiStr){
   });
   return traits;
 }
+
+/**
+ * Convert an MBTI trait object back into its 4-letter string.
+ * @param {object} traits - An object containing E/I, S/N, T/F, J/P values.
+ * @returns {string|null} The 4-letter MBTI string or null if data is missing.
+ */
+export function mbtiToString(traits) {
+  if (!traits) return null;
+  return (traits.E > traits.I ? 'E' : 'I') +
+         (traits.S > traits.N ? 'S' : 'N') +
+         (traits.T > traits.F ? 'T' : 'F') +
+         (traits.J > traits.P ? 'J' : 'P');
+}
