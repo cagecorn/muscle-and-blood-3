@@ -35,6 +35,7 @@ class MBTIChainAttackEngine {
         const chainSkill = { id: 'mbtiChain', name: '체인 어택', type: 'ACTIVE', damageMultiplier: 1 };
         const { damage, hitType } = combatCalculationEngine.calculateDamage(ally, defender, chainSkill);
         this.battleSimulator.skillEffectProcessor._applyDamage(defender, damage, hitType);
+        this.battleSimulator.noticeUI?.show('Chain Attack!');
       }
     });
   }

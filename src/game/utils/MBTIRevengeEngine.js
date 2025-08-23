@@ -35,6 +35,7 @@ class MBTIRevengeEngine {
         const revengeSkill = { id: 'mbtiRevenge', name: '리벤지 어택', type: 'ACTIVE', damageMultiplier: 1 };
         const { damage, hitType } = combatCalculationEngine.calculateDamage(ally, attacker, revengeSkill);
         this.battleSimulator.skillEffectProcessor._applyDamage(attacker, damage, hitType);
+        this.battleSimulator.noticeUI?.show('Revenge Attack!');
       }
     });
   }

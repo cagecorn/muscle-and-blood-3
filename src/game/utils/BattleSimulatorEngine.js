@@ -39,6 +39,8 @@ import { EFFECT_TYPES } from './EffectTypes.js';
 import { BattleSpeedManager } from './BattleSpeedManager.js';
 import { NarrationUIManager } from '../dom/NarrationUIManager.js';
 import { mbtiRevengeEngine } from './MBTIRevengeEngine.js';
+import { mbtiChainAttackEngine } from './MBTIChainAttackEngine.js';
+import { BattleNoticeUIManager } from '../dom/BattleNoticeUIManager.js';
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -77,6 +79,7 @@ export class BattleSimulatorEngine {
         this.turnOrderUI = new TurnOrderUIManager();
         this.sharedResourceUI = new SharedResourceUIManager();
         this.narrationUI = new NarrationUIManager();
+        this.noticeUI = new BattleNoticeUIManager();
         
         // AI 노드에 주입할 엔진 패키지
         this.aiEngines = {
@@ -102,6 +105,7 @@ export class BattleSimulatorEngine {
         // ✨ CombatCalculationEngine에 battleSimulator 참조 설정
         combatCalculationEngine.setBattleSimulator(this);
         mbtiRevengeEngine.setBattleSimulator(this);
+        mbtiChainAttackEngine.setBattleSimulator(this);
 
         this.turnQueue = [];
         this.currentTurnIndex = 0;
