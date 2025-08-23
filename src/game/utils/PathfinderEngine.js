@@ -181,9 +181,18 @@ class PathfinderEngine {
 
         const reachable = [];
         for (const tile of candidateTiles) {
+            // 이동력이 부족한 타일은 탐색하지 않습니다.
+            const heuristic = Math.abs(start.col - tile.col) + Math.abs(start.row - tile.row);
+            if (heuristic > moveRange) {
+                continue;
+            }
+
             const path = await this.findPath(unit, start, tile);
-            if (Array.isArray(path) && path.length <= moveRange) {
-                reachable.push({ path });
+
+            if (Array.isArray(path)) {
+                if (path.length <= moveRange) {
+                    reachable.push({ path });
+                }
             } else if (path) {
                 debugLogEngine.warn('PathfinderEngine', 'findPath가 배열이 아닌 값을 반환했습니다.', { tile, path });
             }
