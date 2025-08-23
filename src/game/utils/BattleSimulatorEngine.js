@@ -38,6 +38,8 @@ import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
 import { EFFECT_TYPES } from './EffectTypes.js';
 import { BattleSpeedManager } from './BattleSpeedManager.js';
 import { NarrationUIManager } from '../dom/NarrationUIManager.js';
+import { mbtiRevengeEngine } from './MBTIRevengeEngine.js';
+import { mbtiChainAttackEngine } from './MBTIChainAttackEngine.js';
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -100,6 +102,8 @@ export class BattleSimulatorEngine {
         aspirationEngine.setBattleSimulator(this);
         // ✨ CombatCalculationEngine에 battleSimulator 참조 설정
         combatCalculationEngine.setBattleSimulator(this);
+        mbtiRevengeEngine.setBattleSimulator(this);
+        mbtiChainAttackEngine.setBattleSimulator(this);
 
         this.turnQueue = [];
         this.currentTurnIndex = 0;
