@@ -23,6 +23,7 @@ import { statusEffects } from '../data/status-effects.js';
 import { cooldownManager } from './CooldownManager.js'; // 쿨다운 매니저 import 추가
 import { aspirationEngine } from './AspirationEngine.js';
 import { trapManager } from './TrapManager.js';
+import { mbtiRevengeEngine } from './MBTIRevengeEngine.js';
 
 /**
  * 스킬의 실제 효과(데미지, 치유, 상태이상 등)를 게임 세계에 적용하는 것을 전담하는 엔진
@@ -370,6 +371,7 @@ class SkillEffectProcessor {
                     // 버프가 없으면 일반 피해 적용
                     hpDamage = this._applyDamage(currentTarget, totalDamage, hitType);
                 }
+                mbtiRevengeEngine.handleAttack(unit, currentTarget, finalSkillData);
                 if (skill.lifeSteal && hpDamage > 0) {
                     const healAmount = Math.round(hpDamage * skill.lifeSteal);
                     unit.currentHp = Math.min(unit.finalStats.hp, unit.currentHp + healAmount);
