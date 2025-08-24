@@ -122,6 +122,22 @@ class CombatCalculationEngine {
         const isMagic = skill.tags?.includes(SKILL_TAGS.MAGIC);
         const isRanged = skill.tags?.includes(SKILL_TAGS.RANGED) && skill.tags?.includes(SKILL_TAGS.PHYSICAL);
 
+        // --- [신규] 명중 판정 로직 ---
+        const accuracyBuff = statusEffectManager.getModifierValue(attacker, 'accuracy');
+        const evadeStatKey = isMagic ? 'magicEvadeChance' : 'physicalEvadeChance';
+        const evadeBuff = statusEffectManager.getModifierValue(defender, evadeStatKey);
+
+        let attackerAccuracy = attackerStats.accuracy ?? 1;
+        if (attackerAccuracy > 1) attackerAccuracy /= 100;
+        let defenderEvade = defenderStats?.[evadeStatKey] ?? 0;
+        if (defenderEvade > 1) defenderEvade /= 100;
+
+        const hitChance = attackerAccuracy + accuracyBuff - (defenderEvade + evadeBuff);
+        if (Math.random() > hitChance) {
+            debugCombatLogManager.logAttackCalculation(attacker, defender, 0, 0, 0);
+            return { damage: 0, hitType: '회피', comboCount: 0 };
+        }
+
         // 1. 공격자의 공격력 버프/디버프 보정치를 가져옵니다.
         const attackStatKey = isMagic ? 'magicAttack' : 'physicalAttack';
         const attackBuffPercent = statusEffectManager.getModifierValue(attacker, attackStatKey);
