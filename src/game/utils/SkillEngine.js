@@ -90,10 +90,14 @@ class SkillEngine {
      * @param {object} unit - 스킬을 사용한 유닛
      * @param {object} skill - 사용한 스킬 데이터
      * @param {object|null} target - 스킬의 대상 (사거리 체크용)
-     */
+    */
     recordSkillUse(unit, skill, target = null) {
-        if (!this.canUseSkill(unit, skill)) return;
+        // 기본 사용 가능 여부 확인
+        if (!this.canUseSkill(unit, skill)) {
+            return false;
+        }
 
+        // 사거리 체크 (대상 존재 시)
         if (target) {
             const attackRange = skill.range ?? unit.finalStats.attackRange ?? 1;
             const distance = Math.abs(unit.gridX - target.gridX) + Math.abs(unit.gridY - target.gridY);
@@ -102,7 +106,7 @@ class SkillEngine {
                     'SkillEngine',
                     `${unit.instanceName} attempted [${skill.name}] out of range (distance ${distance}, range ${attackRange}).`
                 );
-                return;
+                return false;
             }
         }
 
@@ -138,6 +142,8 @@ class SkillEngine {
             'SkillEngine',
             `${unit.instanceName}이(가) 스킬 [${skillLabel}] 사용 (토큰 ${skill.cost} 소모).`
         );
+
+        return true;
     }
 
     /**
