@@ -11,6 +11,9 @@ import { diceEngine } from './DiceEngine.js';
 import { archetypeAssignmentEngine } from './ArchetypeAssignmentEngine.js';
 // MBTI 매핑을 불러옵니다.
 import { CLASS_MBTI_MAP, mbtiFromString } from '../data/classMbtiMap.js';
+// ✨ [신규] 운명 시너지와 시너지 엔진을 가져옵니다.
+import { fateSynergies } from '../data/synergies.js';
+import { synergyEngine } from './SynergyEngine.js';
 
 /**
  * 용병의 생성, 저장, 관리를 전담하는 엔진 (싱글턴)
@@ -74,6 +77,14 @@ class MercenaryEngine {
             newInstance.attributeSpec = randomAttribute;
         }
 
+        // ✨ [신규] 운명 시너지를 랜덤으로 부여합니다.
+        const fateKeys = Object.keys(fateSynergies);
+        const randomFate = diceEngine.getRandomElement(fateKeys);
+        newInstance.synergies = {
+            fate: randomFate,
+            attribute: randomAttribute ? randomAttribute.tag : null
+        };
+
         // ✨ 모든 클래스가 동일한 슬롯 구조를 사용하므로 추가 로직이 필요 없습니다.
 
         newInstance.finalStats = statEngine.calculateStats(newInstance, newInstance.baseStats, newInstance.equippedItems);
@@ -83,9 +94,11 @@ class MercenaryEngine {
             birthReportManager.logNewUnit(newInstance, '아군');
             // --- 파티에 추가 ---
             partyEngine.addPartyMember(uniqueId);
+            synergyEngine.updateAllies(Array.from(this.alliedMercenaries.values()));
         } else {
             this.enemyMercenaries.set(uniqueId, newInstance);
             birthReportManager.logNewUnit(newInstance, '적군');
+            synergyEngine.updateEnemies(Array.from(this.enemyMercenaries.values()));
         }
         
         return newInstance;

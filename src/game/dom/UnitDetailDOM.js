@@ -10,6 +10,7 @@ import { classGrades } from '../data/classGrades.js';
 import { classProficiencies } from '../data/classProficiencies.js';
 // ✨ 새로 만든 특화 태그 데이터를 가져옵니다.
 import { classSpecializations } from '../data/classSpecializations.js';
+import { fateSynergies } from '../data/synergies.js';
 
 /**
  * 용병 상세 정보 창의 DOM을 생성하고 관리하는 유틸리티 클래스
@@ -25,6 +26,7 @@ export class UnitDetailDOM {
         const specializations = classSpecializations[unitData.id] || [];
         // ✨ 1. 용병의 고유 속성 특화 정보를 가져옵니다.
         const attributeSpec = unitData.attributeSpec;
+        const synergies = unitData.synergies || {};
 
         // --- MBTI 문자열과 툴팁 텍스트를 준비합니다. ---
         const mbti = unitData.mbti;
@@ -159,12 +161,22 @@ export class UnitDetailDOM {
                 </div>
             </div>
         `;
+        const synergySectionHTML = `
+            <div class="synergy-section">
+                <div class="section-title">시너지</div>
+                <div class="synergy-tags-container">
+                    ${synergies.fate ? `<span class="synergy-tag">${fateSynergies[synergies.fate]?.name || synergies.fate}</span>` : ''}
+                    ${synergies.attribute ? `<span class="synergy-tag">${synergies.attribute}</span>` : ''}
+                </div>
+            </div>
+        `;
         // =======================================================================
         // ✨ [수정] 클래스 패시브 섹션이 위로 이동했으므로 여기서는 제거합니다.
         // =======================================================================
         leftSection.innerHTML = `
             ${gradeDisplayHTML}
             ${statsContainerHTML}
+            ${synergySectionHTML}
         `;
         // =======================================================================
 
