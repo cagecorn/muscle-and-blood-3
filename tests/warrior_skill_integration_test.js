@@ -602,7 +602,7 @@ for (let turn = 1; turn <= 5; turn++) {
     for (const skill of rankedSkills) {
         if (skill.type === 'PASSIVE') continue;
         if (skillEngine.canUseSkill(soldier, skill)) {
-            skillEngine.recordSkillUse(soldier, skill);
+            skillEngine.recordSkillUse(soldier, skill, skill.target);
             if (skill.effect) {
                 const effectCopy = JSON.parse(JSON.stringify(skill.effect));
                 effectCopy.remaining = effectCopy.duration;

@@ -28,7 +28,7 @@ class AttackTargetNode extends Node {
             debugAIManager.logNodeResult(NodeState.FAILURE, '일반 공격을 위한 토큰 부족');
             return NodeState.FAILURE;
         }
-        skillEngine.recordSkillUse(unit, attackSkill);
+        skillEngine.recordSkillUse(unit, attackSkill, target);
 
         // 스킬 이름을 보여줍니다.
         const skillColor = SKILL_TYPES[attackSkill.type].color;
