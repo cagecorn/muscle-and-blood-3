@@ -20,7 +20,14 @@ class SynergyEngine {
             def.bonuses.forEach(b => {
                 if (count >= b.count) multiplier = b.multiplier;
             });
-            u.finalStats.hp = Math.round(u.baseStats.hp * multiplier);
+            const stats = Array.isArray(def.stat) ? def.stat : [def.stat || 'hp'];
+            stats.forEach(statKey => {
+                const baseValue = u.finalStats[statKey] || 0;
+                u.finalStats[statKey] = Math.round(baseValue * multiplier);
+            });
+            if (stats.includes('maxBarrier')) {
+                u.finalStats.currentBarrier = u.finalStats.maxBarrier;
+            }
         });
     }
 
@@ -59,6 +66,7 @@ class SynergyEngine {
                 name: def?.name || key,
                 count,
                 multiplier,
+                statName: def?.statName || 'HP',
                 bonuses: def?.bonuses || []
             };
         });

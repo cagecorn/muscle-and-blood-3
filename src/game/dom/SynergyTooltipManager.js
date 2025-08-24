@@ -11,7 +11,7 @@ export class SynergyTooltipManager {
         let html = `<div class="synergy-tooltip-name">${def.name}</div>`;
         def.bonuses.forEach(b => {
             const active = count >= b.count ? 'active' : '';
-            html += `<div class="synergy-tooltip-line ${active}">${b.count}명: HP x${b.multiplier}</div>`;
+            html += `<div class="synergy-tooltip-line ${active}">${b.count}명: ${def.statName || 'HP'} x${b.multiplier}</div>`;
         });
         tooltip.innerHTML = html;
         document.body.appendChild(tooltip);
