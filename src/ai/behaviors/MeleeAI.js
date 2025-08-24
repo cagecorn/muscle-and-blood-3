@@ -16,14 +16,17 @@ import { NodeState } from '../nodes/Node.js';
 import MoveToUseSkillNode from '../nodes/MoveToUseSkillNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 import UseBuffSkillOrWaitNode from '../nodes/UseBuffSkillOrWaitNode.js';
+import FindNearestAllyInDangerNode from '../nodes/FindNearestAllyInDangerNode.js';
+import FindEnemyAttackingAllyNode from '../nodes/FindEnemyAttackingAllyNode.js';
 
 /**
  * Improved MeleeAI: 근접 공격형 AI 행동 트리의 강화 버전
  * 우선순위:
  * 1. (생존) 체력이 25% 미만이면 안전한 위치로 후퇴합니다.
- * 2. (마무리) 공격 가능한 체력이 가장 낮은 적을 찾아 공격합니다.
- * 3. (전략) 우선순위 타겟(원거리/힐러)을 찾아 공격합니다.
- * 4. (기본) 위 모든 행동이 불가능할 경우, 가장 가까운 적을 공격합니다.
+ * 2. (지원) 가까운 아군이 위협받고 있다면 해당 적을 우선 공격합니다.
+ * 3. (마무리) 공격 가능한 체력이 가장 낮은 적을 찾아 공격합니다.
+ * 4. (전략) 우선순위 타겟(원거리/힐러)을 찾아 공격합니다.
+ * 5. (기본) 위 모든 행동이 불가능할 경우, 가장 가까운 적을 공격합니다.
  */
 function createMeleeAI(engines = {}) {
     // 현재 타겟을 스킬 타겟으로 동기화하는 헬퍼 노드
@@ -65,37 +68,44 @@ function createMeleeAI(engines = {}) {
             new MoveToTargetNode(engines)
         ]),
 
-        // 2순위: 체력이 가장 낮은 적 마무리
+        // 2순위: 위기에 처한 아군을 지원
+        new SequenceNode([
+            new FindNearestAllyInDangerNode(),
+            new FindEnemyAttackingAllyNode(),
+            executeSkillBranch
+        ]),
+
+        // 3순위: 체력이 가장 낮은 적 마무리
         new SequenceNode([
             new FindLowestHealthEnemyNode(engines),
             executeSkillBranch
         ]),
 
-        // 3순위: 우선순위 타겟(원거리/힐러) 공격
+        // 4순위: 우선순위 타겟(원거리/힐러) 공격
         new SequenceNode([
             new FindPriorityTargetNode(engines),
             executeSkillBranch
         ]),
 
-        // 4순위: 기본 공격 (가장 가까운 적)
+        // 5순위: 기본 공격 (가장 가까운 적)
         new SequenceNode([
             new FindTargetNode(engines),
             executeSkillBranch
         ]),
-        // 5순위: 공격에 실패했다면 적을 향해 전진
+        // 6순위: 공격에 실패했다면 적을 향해 전진
         new SequenceNode([
             new HasNotMovedNode(),
             new FindTargetNode(engines),
             new FindPathToTargetNode(engines),
             new MoveToTargetNode(engines)
         ]),
-        // 6순위: 전진도 불가능하면 안전한 위치로 이동
+        // 7순위: 전진도 불가능하면 안전한 위치로 이동
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),
             new MoveToTargetNode(engines)
         ]),
-        // 7순위: 경로를 찾지 못한 경우 버프 스킬 사용 또는 대기
+        // 8순위: 경로를 찾지 못한 경우 버프 스킬 사용 또는 대기
         new UseBuffSkillOrWaitNode(engines)
     ]);
 
