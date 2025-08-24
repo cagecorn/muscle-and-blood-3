@@ -86,7 +86,10 @@ class UseSkillNode extends Node {
 
 
         // 스킬 사용 기록
-        this.skillEngine.recordSkillUse(unit, finalSkill, skillTarget);
+        if (!this.skillEngine.recordSkillUse(unit, finalSkill, skillTarget)) {
+            debugAIManager.logNodeResult(NodeState.FAILURE, `스킬 [${finalSkill.name}] 사용 실패`);
+            return NodeState.FAILURE;
+        }
         const usedSkills = blackboard.get('usedSkillsThisTurn') || new Set();
         usedSkills.add(instanceId);
         blackboard.set('usedSkillsThisTurn', usedSkills);
