@@ -1,4 +1,5 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+import { debugCommanderActionManager } from '../debug/DebugCommanderActionManager.js';
 
 /**
  * 전투 중 발생하는 모든 스킬 태그를 감지하고 기록하는 중앙 매니저입니다.
@@ -30,6 +31,10 @@ class BattleTagManager {
         );
         debugLogEngine.log(this.name, `발생한 태그: %c${tagString}`, 'color: #facc15;');
         console.groupEnd();
+
+        if (attacker.id === 'commander') {
+            debugCommanderActionManager.logSkillUse(attacker, target, skillData);
+        }
 
         // 향후 이 곳에서 특정 태그에 반응하는 로직을 실행할 수 있습니다.
         // 예: eventEmitter.emit('skillTag', { attacker, target, skillData });
