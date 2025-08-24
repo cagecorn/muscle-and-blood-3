@@ -1,6 +1,8 @@
 import { partyEngine } from '../utils/PartyEngine.js';
 import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { formationEngine } from '../utils/FormationEngine.js';
+import { synergyEngine } from '../utils/SynergyEngine.js';
+import { SynergyTooltipManager } from './SynergyTooltipManager.js';
 
 export class FormationDOMEngine {
     constructor(scene, domEngine) {
@@ -47,6 +49,11 @@ export class FormationDOMEngine {
         }
 
         this.placeUnits();
+
+        this.synergyContainer = document.createElement('div');
+        this.synergyContainer.id = 'active-synergy-container';
+        this.container.appendChild(this.synergyContainer);
+        this.renderSynergySummary();
 
         const backButton = document.createElement('div');
         backButton.id = 'formation-back-button';
@@ -119,6 +126,7 @@ export class FormationDOMEngine {
             const otherId = parseInt(targetUnit.dataset.unitId);
             if (otherId) formationEngine.setPosition(otherId, parseInt(fromCell.dataset.index));
         }
+        this.renderSynergySummary();
     }
 
     hide() {
@@ -128,5 +136,19 @@ export class FormationDOMEngine {
     destroy() {
         this.container.innerHTML = '';
         this.hide();
+    }
+
+    renderSynergySummary() {
+        const units = partyEngine.getDeployedMercenaries();
+        const summary = synergyEngine.getFateSynergySummary(units);
+        this.synergyContainer.innerHTML = '';
+        summary.forEach(s => {
+            const div = document.createElement('div');
+            div.className = 'active-synergy-item';
+            div.innerText = `${s.name}: HP x${s.multiplier} (${s.count})`;
+            div.addEventListener('mouseenter', e => SynergyTooltipManager.show(s.key, s.count, e));
+            div.addEventListener('mouseleave', () => SynergyTooltipManager.hide());
+            this.synergyContainer.appendChild(div);
+        });
     }
 }

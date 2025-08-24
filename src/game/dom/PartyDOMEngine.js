@@ -1,6 +1,9 @@
 import { mercenaryEngine } from '../utils/MercenaryEngine.js';
+import { partyEngine } from '../utils/PartyEngine.js';
 // ✨ [변경] statEngine 대신 UnitDetailDOM을 import 합니다.
 import { UnitDetailDOM } from './UnitDetailDOM.js';
+import { synergyEngine } from '../utils/SynergyEngine.js';
+import { SynergyTooltipManager } from './SynergyTooltipManager.js';
 
 /**
  * 파티 관리 화면의 DOM 요소를 생성하고 관리하는 엔진
@@ -18,8 +21,13 @@ export class PartyDOMEngine {
         this.activeGrid = null;
         this.reserveGrid = null;
         this.unitDetailView = null;
+        this.synergyContainer = null;
 
         this.container.style.display = 'block';
+
+        this.synergyContainer = document.createElement('div');
+        this.synergyContainer.id = 'active-synergy-container';
+        this.container.appendChild(this.synergyContainer);
 
         this.createGrid();
         this.addBackButton();
@@ -123,6 +131,7 @@ export class PartyDOMEngine {
     refresh() {
         this.renderPartyMembers();
         this.renderReserveMembers();
+        this.renderSynergySummary();
     }
 
     addBackButton() {
@@ -164,5 +173,19 @@ export class PartyDOMEngine {
         if (this.unitDetailView) this.unitDetailView.remove();
         this.container.innerHTML = '';
         this.hide();
+    }
+
+    renderSynergySummary() {
+        const units = partyEngine.getDeployedMercenaries();
+        const summary = synergyEngine.getFateSynergySummary(units);
+        this.synergyContainer.innerHTML = '';
+        summary.forEach(s => {
+            const div = document.createElement('div');
+            div.className = 'active-synergy-item';
+            div.innerText = `${s.name}: HP x${s.multiplier} (${s.count})`;
+            div.addEventListener('mouseenter', e => SynergyTooltipManager.show(s.key, s.count, e));
+            div.addEventListener('mouseleave', () => SynergyTooltipManager.hide());
+            this.synergyContainer.appendChild(div);
+        });
     }
 }

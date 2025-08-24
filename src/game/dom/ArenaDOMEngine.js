@@ -4,6 +4,8 @@ import { formationEngine } from '../utils/FormationEngine.js';
 import { arenaManager } from '../utils/ArenaManager.js';
 // ✨ UnitDetailDOM을 import하여 게임 내 상세 정보창을 사용합니다.
 import { UnitDetailDOM } from './UnitDetailDOM.js';
+import { synergyEngine } from '../utils/SynergyEngine.js';
+import { SynergyTooltipManager } from './SynergyTooltipManager.js';
 
 export class ArenaDOMEngine {
     constructor(scene, domEngine) {
@@ -51,6 +53,11 @@ export class ArenaDOMEngine {
 
         this.placeUnits();
         this.placeEnemyUnits(); // 적 유닛 배치
+
+        this.synergyContainer = document.createElement('div');
+        this.synergyContainer.id = 'active-synergy-container';
+        this.container.appendChild(this.synergyContainer);
+        this.renderSynergySummary();
 
         const backButton = document.createElement('div');
         backButton.id = 'formation-back-button';
@@ -123,6 +130,7 @@ export class ArenaDOMEngine {
             const otherId = parseInt(targetUnit.dataset.unitId);
             if (otherId) formationEngine.setPosition(otherId, parseInt(fromCell.dataset.index));
         }
+        this.renderSynergySummary();
     }
 
     // ✨ [수정] 적 유닛 배치 로직 수정
@@ -185,5 +193,19 @@ export class ArenaDOMEngine {
     destroy() {
         this.container.innerHTML = '';
         this.hide();
+    }
+
+    renderSynergySummary() {
+        const units = partyEngine.getDeployedMercenaries();
+        const summary = synergyEngine.getFateSynergySummary(units);
+        this.synergyContainer.innerHTML = '';
+        summary.forEach(s => {
+            const div = document.createElement('div');
+            div.className = 'active-synergy-item';
+            div.innerText = `${s.name}: HP x${s.multiplier} (${s.count})`;
+            div.addEventListener('mouseenter', e => SynergyTooltipManager.show(s.key, s.count, e));
+            div.addEventListener('mouseleave', () => SynergyTooltipManager.hide());
+            this.synergyContainer.appendChild(div);
+        });
     }
 }
