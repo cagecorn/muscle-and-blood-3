@@ -11,6 +11,9 @@ import { classProficiencies } from '../data/classProficiencies.js';
 // ✨ 새로 만든 특화 태그 데이터를 가져옵니다.
 import { classSpecializations } from '../data/classSpecializations.js';
 import { fateSynergies } from '../data/synergies.js';
+import { partyEngine } from '../utils/PartyEngine.js';
+import { synergyEngine } from '../utils/SynergyEngine.js';
+import { SynergyTooltipManager } from './SynergyTooltipManager.js';
 
 /**
  * 용병 상세 정보 창의 DOM을 생성하고 관리하는 유틸리티 클래스
@@ -27,6 +30,9 @@ export class UnitDetailDOM {
         // ✨ 1. 용병의 고유 속성 특화 정보를 가져옵니다.
         const attributeSpec = unitData.attributeSpec;
         const synergies = unitData.synergies || {};
+        const deployed = partyEngine.getDeployedMercenaries();
+        const fateSummary = synergyEngine.getFateSynergySummary(deployed);
+        const activeFateCount = synergies.fate ? (fateSummary.find(s => s.key === synergies.fate)?.count || 0) : 0;
 
         // --- MBTI 문자열과 툴팁 텍스트를 준비합니다. ---
         const mbti = unitData.mbti;
@@ -178,6 +184,11 @@ export class UnitDetailDOM {
             ${statsContainerHTML}
             ${synergySectionHTML}
         `;
+        const fateTag = leftSection.querySelector('.synergy-tag');
+        if (fateTag && synergies.fate) {
+            fateTag.addEventListener('mouseenter', (e) => SynergyTooltipManager.show(synergies.fate, activeFateCount, e));
+            fateTag.addEventListener('mouseleave', () => SynergyTooltipManager.hide());
+        }
         // =======================================================================
 
         const rightSection = document.createElement('div');

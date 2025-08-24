@@ -39,6 +39,30 @@ class SynergyEngine {
         this._recalcStats(units);
         this._applyFateSynergies(units);
     }
+
+    getFateSynergySummary(units) {
+        const counts = {};
+        units.forEach(u => {
+            const fate = u.synergies?.fate;
+            if (fate) counts[fate] = (counts[fate] || 0) + 1;
+        });
+        return Object.entries(counts).map(([key, count]) => {
+            const def = fateSynergies[key];
+            let multiplier = 1;
+            if (def) {
+                def.bonuses.forEach(b => {
+                    if (count >= b.count) multiplier = b.multiplier;
+                });
+            }
+            return {
+                key,
+                name: def?.name || key,
+                count,
+                multiplier,
+                bonuses: def?.bonuses || []
+            };
+        });
+    }
 }
 
 export const synergyEngine = new SynergyEngine();
