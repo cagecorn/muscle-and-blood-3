@@ -43,12 +43,21 @@ class AttackTargetNode extends Node {
         // 공격 애니메이션
         await this.animationEngine.attack(unit.sprite, target.sprite);
 
-        // 피격 스프라이트로 변경
-        spriteEngine.changeSpriteForDuration(target, 'hitted', 300);
-
         // 데미지 계산 및 적용
         // ✨ 데미지 계산 시 스킬 정보 전달
         const { damage, hitType, comboCount } = this.combatEngine.calculateDamage(unit, target, attackSkill);
+
+        if (hitType === '회피') {
+            this.vfxManager.showComboCount(comboCount);
+            this.vfxManager.createDamageNumber(target.sprite.x, target.sprite.y, 0, '#a3a3a3', '회피');
+            await this.delayEngine.hold(200);
+            debugAIManager.logNodeResult(NodeState.SUCCESS);
+            return NodeState.SUCCESS;
+        }
+
+        // 피격 스프라이트로 변경
+        spriteEngine.changeSpriteForDuration(target, 'hitted', 300);
+
         target.currentHp -= damage;
 
         // 시각 효과

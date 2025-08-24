@@ -480,6 +480,11 @@ class SkillEffectProcessor {
 
     // --- [신규] 피해 적용 로직을 별도 메서드로 추출 ---
     _applyDamage(target, damage, hitType, color = '#ff4d4d') {
+        if (hitType === '회피') {
+            this.vfxManager.createDamageNumber(target.sprite.x, target.sprite.y, 0, '#a3a3a3', '회피');
+            return 0;
+        }
+
         const damageToBarrier = Math.min(target.currentBarrier, damage);
         const damageToHp = damage - damageToBarrier;
 
