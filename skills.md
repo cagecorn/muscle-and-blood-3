@@ -16,6 +16,42 @@
 | 🎯 **크리티컬 샷** | 적에게 90~110% 피해를 주며 반드시 치명타가 됩니다. | 3 | 3 | 3 | `ACTIVE`, `RANGED`, `PHYSICAL`, `FIXED` |
 | 🔥 **낙인** | 가장 멀리 있는 체력이 낮은 적 1명에게 3턴간 치료 금지 디버프를 부여합니다. (철 3 소모) | 0 | 5 | 10 | `DEBUFF`, `RANGED`, `PROHIBITION`, `SPECIAL` |
 | 🌀 **끌어당기기** | 5타일 내의 적을 자신의 바로 앞으로 끌어옵니다. | 3 | 5 | 5 | `ACTIVE`, `PHYSICAL`, `BIND`, `KINETIC` |
+| ❄️ **아이스 볼트** | 적에게 80% 마법 피해를 주고 20% 확률로 1턴간 [둔화]시킵니다. | 1 | 0 | 3 | `ACTIVE`, `RANGED`, `MAGIC`, `WATER` |
+| ❄️ **프로스트 노바** | 3x3 범위의 적에게 50% 마법 피해를 주고 1턴간 [속박]합니다. | 3 | 4 | 3 | `ACTIVE`, `RANGED`, `MAGIC`, `WATER`, `AREA_DENIAL`, `BIND` |
+| ❄️ **블리자드** | 지정 위치에 2턴간 눈보라를 소환해 이동력을 2 감소시킵니다. (물 3 소모) | 0 | 5 | 4 | `ACTIVE`, `RANGED`, `MAGIC`, `WATER`, `AREA_DENIAL`, `DELAY` |
+| 📢 **도발** | 주위 3타일 적을 2턴간 [도발]하고 자신은 방어력 20% 증가. | 2 | 3 | 0 | `ACTIVE`, `DEBUFF`, `AURA`, `GUARDIAN` |
+| 🛡️ **방패 치기** | 최대 체력 15% 물리 피해와 30% 확률 [기절] 부여. | 2 | 1 | 1 | `ACTIVE`, `PHYSICAL`, `MELEE`, `GUARDIAN` |
+| 🌀 **회전 베기** | 주변 4타일 적에게 70% 물리 피해, [바람] 1 생산. | 3 | 3 | 0 | `ACTIVE`, `PHYSICAL`, `MELEE`, `PRODUCTION`, `AURA`, `WIND` |
+| 🪨 **대지 가르기** | 3타일 직선상의 적에게 70% 물리 피해, [대지] 1 생산. | 3 | 3 | 3 | `ACTIVE`, `PHYSICAL`, `MELEE`, `PRODUCTION`, `EARTH` |
+| 🌪️ **질풍 사격** | 적에게 65~85% 피해 후 2칸 밀쳐냅니다. | 3 | 3 | 3 | `ACTIVE`, `RANGED`, `PHYSICAL`, `KINETIC` |
+| 🔁 **도탄 사격** | 주 대상 80% 피해, 주변 적 최대 2명에게 40% 피해. | 2 | 2 | 3 | `ACTIVE`, `RANGED`, `PHYSICAL`, `KINETIC` |
+| 🔥 **파이어볼** | 십자 범위에 100~120% 마법 피해와 2턴 [화상]. | 3 | 3 | 4 | `ACTIVE`, `RANGED`, `MAGIC`, `FIRE`, `SPECIAL` |
+| ❄️ **아이스볼** | 십자 범위에 90~110% 마법 피해와 2턴 [동상]. | 3 | 3 | 4 | `ACTIVE`, `RANGED`, `MAGIC`, `WATER`, `SPECIAL` |
+| ⚡ **라이트닝 스트라이크** | 십자 범위에 마법 피해와 2턴 [감전] 부여. | 3 | 3 | 4 | `ACTIVE`, `RANGED`, `MAGIC`, `WIND`, `SPECIAL` |
+| 🪨 **스톤 블라스트** | 십자 범위에 마법 피해와 2턴 [약화] 부여. | 3 | 3 | 4 | `ACTIVE`, `RANGED`, `MAGIC`, `EARTH`, `SPECIAL` |
+| ✨ **홀리 라이트** | 십자 범위에 마법 피해와 2턴 [취약] 부여. | 3 | 3 | 4 | `ACTIVE`, `RANGED`, `MAGIC`, `LIGHT`, `SPECIAL` |
+| 🌑 **섀도우 볼트** | 십자 범위에 마법 피해와 2턴 [정기 흡수]. | 3 | 3 | 4 | `ACTIVE`, `RANGED`, `MAGIC`, `DARK`, `SPECIAL` |
+| 🎯 **관통 사격** | 3칸 직선 관통탄으로 경로상의 적에게 물리 피해. | 3 | 3 | 4 | `ACTIVE`, `RANGED`, `PHYSICAL`, `SPECIAL` |
+| ⚔️ **더블 스트라이크** | 80% 위력으로 두 번 연속 공격합니다. | 2 | 0 | 1 | `ACTIVE`, `PHYSICAL`, `MELEE`, `COMBO` |
+| 🎭 **깜짝쇼** | 적 힐러/서포터와 위치를 교환합니다. (바람 3 소모) | 0 | 5 | - | `ACTIVE`, `KINETIC`, `MIND`, `SPECIAL` |
+| 😄 **무해한 농담** | 주위 3타일 아군 열망 +10, 적 열망 -10. | 2 | 3 | 0 | `AURA`, `MIND` |
+| ☠️ **맹독 구름** | 3x3 범위에 3턴간 [중독] 안개를 뿌립니다. (독 2 소모) | 0 | 4 | 3 | `ACTIVE`, `RANGED`, `MAGIC`, `POISON`, `DEBUFF`, `AURA` |
+| 🏹 **쟈벨린 투척** | 5타일 적에게 100% 물리 피해. (철 2 소모) | 0 | 0 | 5 | `ACTIVE`, `RANGED`, `PHYSICAL`, `THROWING`, `IRON`, `SPECIAL` |
+| 🎯 **저격** | 5타일 적에게 100% 피해, 장거리일수록 +20% 피해. | 3 | 2 | 5 | `ACTIVE`, `RANGED`, `PHYSICAL`, `FIXED` |
+| 🍾 **화염병 투척** | 3타일 적에게 80% 물리 피해 및 2턴 [화상]. [불] 1 생산. | 2 | 2 | 3 | `ACTIVE`, `RANGED`, `PHYSICAL`, `THROWING`, `FIRE`, `PRODUCTION` |
+| 🪤 **강철 덫** | 3턴간 지속되는 덫을 설치, 밟은 적 [속박]. | 2 | 2 | 3 | `ACTIVE`, `TRAP`, `PROHIBITION` |
+| ☠️ **맹독 함정** | 3턴 지속 독 함정, 밟은 적 2턴 [중독]. | 2 | 3 | 3 | `ACTIVE`, `TRAP`, `DEBUFF` |
+| ⚡ **전격 함정** | 2턴 지속 전기 함정, 밟은 적 2턴 [감전]. | 3 | 4 | 3 | `ACTIVE`, `TRAP`, `DEBUFF` |
+| ❄️ **빙결 함정** | 3턴 지속 냉기 함정, 밟은 적 2턴 [동상]. | 1 | 2 | 3 | `ACTIVE`, `TRAP`, `DEBUFF` |
+| 🔥 **화염 함정** | 3턴 지속 화염 함정, 밟은 적 2턴 [화상]. | 2 | 3 | 3 | `ACTIVE`, `TRAP`, `DEBUFF` |
+| 🔋 **나노레일건** | 3타일 적에게 50% 물리+50% 마법 피해. (빛 2 소모) | 0 | 4 | 3 | `ACTIVE`, `RANGED`, `PHYSICAL`, `MAGIC`, `LIGHT`, `SPECIAL` |
+| 🗡️ **암살** | 100% 물리 피해, 대상 체력 30% 이하 시 2배 피해. | 3 | 2 | 1 | `ACTIVE`, `PHYSICAL`, `MELEE`, `EXECUTE` |
+| ✨ **Mana Strike** | 마나 블레이드로 인접 적을 공격합니다. | 2 | 0 | 1 | `ACTIVE`, `MELEE`, `MAGIC`, `ATTACK` |
+| 💥 **Arcane Charge** | 3타일 돌진 후 1턴간 마법 실드 10 획득. | 3 | 2 | 3 | `ACTIVE`, `CHARGE`, `MOVEMENT`, `BUFF`, `SHIELD` |
+| 🌌 **Force Unleashed** | 2타일 내 모든 적에게 강력한 충격파를 방출. | 4 | 3 | 0 | `ACTIVE`, `FORCE`, `MAGIC`, `AOE`, `ATTACK` |
+| 📡 **Kinetic Beam** | 직선상 적들에게 관통하는 운동 에너지 빔. | 3 | 2 | 4 | `ACTIVE`, `BEAM`, `KINETIC`, `RANGED`, `ATTACK` |
+| 💢 **광폭 일격** | 120% 물리 피해 후 자신 방어력 10% 감소. | 2 | 1 | 1 | `ACTIVE`, `MELEE`, `PHYSICAL` |
+| 🔨 **마나 분쇄** | 80% 물리 피해와 2턴간 마법 공격력 15% 감소. | 2 | 2 | 1 | `ACTIVE`, `PHYSICAL`, `DEBUFF` |
 
 ## 🤝 지원 (Aid)
 
@@ -24,6 +60,13 @@
 | ✨ **힐** | 아군 하나의 체력을 회복합니다. | 1 | 0 | 2 | `AID`, `RANGED`, `HEAL` |
 | 🛡️ **윌 가드** | 아군에게 치유 후 다음 2회의 공격을 [확정 막기]로 만듭니다. | 3 | 3 | 3 | `AID`, `RANGED`, `WILL_GUARD`, `FIXED`, `HEAL` |
 | 🌟 **마이티 쉴드** | 아군에게 2회의 공격을 완전히 막는 빛의 방패를 부여합니다. (빛 5 소모) | 0 | 10 | 3 | `AID`, `WILL_GUARD`, `FIXED`, `LIGHT`, `SPECIAL` |
+| ☠️ **맹독 바르기** | 아군 무기에 독을 발라 2턴간 공격 시 50% 확률로 [중독]시킵니다. [독] 1 생산. | 1 | 2 | 2 | `AID`, `BUFF`, `POISON`, `PRODUCTION` |
+| 🚀 **오버드라이브** | 체력 10%를 소모하여 대상 스킬 쿨타임을 1 감소시키고 3턴간 특수 스킬 위력 20% 증가. | 3 | 6 | 2 | `AID`, `BUFF`, `SACRIFICE` |
+| 🛡️ **고귀한 희생** | 체력 10%를 소모해 아군 용맹 배리어를 30% 회복합니다. (철 3 소모) | 0 | 0 | 2 | `AID`, `WILL_GUARD`, `SACRIFICE`, `SPECIAL` |
+| 🔗 **링크 프로토콜** | 대상과 연결하여 3턴간 받는 피해의 50%를 대신 받습니다. | 2 | 4 | 3 | `AID`, `BUFF`, `WILL_GUARD`, `SACRIFICE` |
+| 🤚 **부패의 손길** | 아군에게 사용 시 모든 디버프 제거, 적에게 사용 시 버프 제거. | 2 | 3 | 2 | `AID`, `DEBUFF`, `HEAL`, `PROHIBITION` |
+| 🔧 **긴급 수리** | 소환수 체력 50% 회복 후 2턴간 공격력 25% 증가. | 2 | 4 | 3 | `AID`, `HEAL`, `BUFF`, `SUMMON` |
+| 💉 **아드레날린 주사** | 아군의 [둔화]/[속박]을 해제하고 2턴간 [아드레날린] 버프를 부여합니다. | 3 | 5 | 1 | `AID`, `BUFF` |
 
 ## 🛡️ 버프 (Buff)
 
@@ -33,12 +76,23 @@
 | ⚒️ **숯돌 갈기** | 1턴간 공격력 10% 증가하고 [철] 1을 생산합니다. | 1 | 2 | 0 | `BUFF`, `IRON`, `PRODUCTION` |
 | 📣 **전투의 함성** | 2턴간 공격력 15% 증가, 근접 공격 등급 +1. | 2 | 3 | 0 | `BUFF`, `WILL` |
 | 👁️ **사냥꾼의 감각** | 3턴간 원거리 공격 등급 +1, 치명타 확률 15% 증가. | 2 | 4 | 0 | `BUFF`, `WILL` |
+| 📯 **집결의 뿔피리** | 전장 모든 아군에게 3턴간 용맹 +2를 부여합니다. | 2 | 5 | 0 | `BUFF`, `AURA`, `WILL`, `STRATEGY` |
+| 🏅 **용맹의 증거** | 주위 3타일 아군 배리어를 매턴 5% 회복, [빛] 2 생산. | 3 | 5 | 0 | `BUFF`, `AURA`, `WILL`, `LIGHT`, `PRODUCTION` |
+| ⛪ **성역** | 주위 2타일 아군의 물리/마법 방어력 15% 증가. | 3 | 4 | 0 | `BUFF`, `AURA`, `WILL_GUARD`, `HOLY` |
+| ☄️ **응징의 오라** | 주위 2타일 아군 공격 시 추가 신성 피해를 줍니다. | 2 | 4 | 0 | `BUFF`, `AURA`, `HOLY`, `LIGHT` |
+| 🤖 **나노봇** | 5턴간 [나노봇 착용]; 액티브 사용 시 추가 30% 피해. | 3 | 6 | 0 | `BUFF`, `ON_HIT`, `MAGIC`, `PRODUCTION` |
+| 🩸 **피의 격노** | 2턴간 물리 공격력 +20%, 방어력 -10%. | 2 | 3 | 0 | `BUFF`, `PHYSICAL` |
+| 🛡️ **마력 차단장** | 2턴간 자신과 주변 아군의 마법 방어력 +25%. | 2 | 4 | 0 | `BUFF`, `AURA` |
 
 ## ⚠️ 디버프 (Debuff)
 
 | 스킬 | 설명 | 🔷 토큰 | ⏱️ 쿨타임 | 🎯 사거리 | 태그 |
 |------|------|---------|-----------|-----------|------|
 | 🛡️ **쉴드 브레이크** | 적에게 3턴간 받는 피해 15% 증가 디버프를 겁니다. | 2 | 2 | 1 | `DEBUFF`, `MELEE` |
+| 🎯 **집중 포화** | 3턴간 대상이 받는 피해를 15% 증가시킵니다. (철 2 소모) | 0 | 4 | 5 | `DEBUFF`, `RANGED`, `STRATEGY`, `SPECIAL` |
+| 🧠 **컨퓨전** | 적을 2턴간 혼란 상태로 만들어 아군을 공격하게 합니다. | 3 | 3 | 3 | `DEBUFF`, `RANGED`, `MAGIC`, `MIND`, `PROHIBITION`, `SPECIAL` |
+| 💻 **시스템 해킹** | 적을 1턴간 [무장 해제] 상태로 만들어 공격과 스킬을 봉쇄합니다. | 2 | 4 | 3 | `DEBUFF`, `RANGED`, `MAGIC`, `PROHIBITION`, `MIND`, `SPECIAL` |
+| ❌ **무효화** | 적의 모든 버프를 해제하고, 없으면 1턴간 [바이러스] 상태로 만듭니다. | 2 | 3 | 4 | `DEBUFF`, `RANGED`, `MIND`, `PROHIBITION` |
 
 ## 🧘 패시브 (Passive)
 
