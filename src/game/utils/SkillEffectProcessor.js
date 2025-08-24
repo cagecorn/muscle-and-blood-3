@@ -25,6 +25,7 @@ import { aspirationEngine } from './AspirationEngine.js';
 import { trapManager } from './TrapManager.js';
 import { mbtiRevengeEngine } from './MBTIRevengeEngine.js';
 import { mbtiChainAttackEngine } from './MBTIChainAttackEngine.js';
+import { pathfinderEngine } from './PathfinderEngine.js';
 
 /**
  * 스킬의 실제 효과(데미지, 치유, 상태이상 등)를 게임 세계에 적용하는 것을 전담하는 엔진
@@ -91,6 +92,9 @@ class SkillEffectProcessor {
             case 'STRATEGY':
                 // BUFF와 STRATEGY는 주로 상태 효과 적용이 핵심
                 spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
+                if (skill.id === 'shadowStep') {
+                    await this._processShadowStep(unit, skill, blackboard);
+                }
                 break;
         }
 
@@ -603,6 +607,27 @@ class SkillEffectProcessor {
         await formationEngine.swapUnitPositions(unit, target, this.animationEngine);
     }
     // ▲▲▲ [신규] 추가 완료 ▲▲▲
+
+    async _processShadowStep(unit, skill, blackboard) {
+        const dest = blackboard?.get('shadowStepDestination');
+        if (!dest) {
+            debugLogEngine.log('SkillEffectProcessor', 'ShadowStep destination not specified.');
+            return;
+        }
+
+        const path = await pathfinderEngine.findPath(
+            unit,
+            { col: unit.gridX, row: unit.gridY },
+            dest
+        );
+        const maxRange = skill.range ?? 3;
+        if (!Array.isArray(path) || path.length === 0 || path.length > maxRange) {
+            debugLogEngine.log('SkillEffectProcessor', 'ShadowStep destination out of range or blocked.');
+            return;
+        }
+
+        await formationEngine.moveUnitOnGrid(unit, dest, this.animationEngine, 200);
+    }
 
     async _processSummonSkill(unit, skill) {
         spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
