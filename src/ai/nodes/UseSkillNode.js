@@ -86,7 +86,7 @@ class UseSkillNode extends Node {
 
 
         // 스킬 사용 기록
-        this.skillEngine.recordSkillUse(unit, finalSkill);
+        this.skillEngine.recordSkillUse(unit, finalSkill, skillTarget);
         const usedSkills = blackboard.get('usedSkillsThisTurn') || new Set();
         usedSkills.add(instanceId);
         blackboard.set('usedSkillsThisTurn', usedSkills);

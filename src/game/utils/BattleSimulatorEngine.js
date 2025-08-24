@@ -460,7 +460,7 @@ export const battleSimulatorEngine = {
                     chosen = basicAttack;
                 }
 
-                skillEngine.recordSkillUse(unit, chosen);
+                skillEngine.recordSkillUse(unit, chosen, target);
                 const { damage } = combatCalculationEngine.calculateDamage(unit, target, chosen);
                 target.currentHp = Math.max(0, target.currentHp - damage);
 

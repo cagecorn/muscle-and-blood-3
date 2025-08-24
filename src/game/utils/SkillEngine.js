@@ -89,9 +89,22 @@ class SkillEngine {
      * 용병이 스킬을 사용하는 것을 기록합니다.
      * @param {object} unit - 스킬을 사용한 유닛
      * @param {object} skill - 사용한 스킬 데이터
+     * @param {object|null} target - 스킬의 대상 (사거리 체크용)
      */
-    recordSkillUse(unit, skill) {
+    recordSkillUse(unit, skill, target = null) {
         if (!this.canUseSkill(unit, skill)) return;
+
+        if (target) {
+            const attackRange = skill.range ?? unit.finalStats.attackRange ?? 1;
+            const distance = Math.abs(unit.gridX - target.gridX) + Math.abs(unit.gridY - target.gridY);
+            if (distance > attackRange) {
+                debugLogEngine.log(
+                    'SkillEngine',
+                    `${unit.instanceName} attempted [${skill.name}] out of range (distance ${distance}, range ${attackRange}).`
+                );
+                return;
+            }
+        }
 
         // 토큰 소모
         tokenEngine.spendTokens(unit.uniqueId, skill.cost);
