@@ -46,5 +46,54 @@ export const fateSynergies = {
             { count: 10, multiplier: 1.20 },
             { count: 12, multiplier: 1.30 }
         ]
+    },
+    seeker: {
+        name: '탐구자',
+        stat: 'magicAttack',
+        statName: '마법 공격력',
+        bonuses: [
+            { count: 4, multiplier: 1.10 },
+            { count: 6, multiplier: 1.20 },
+            { count: 8, multiplier: 1.40 },
+            { count: 10, multiplier: 1.60 },
+            { count: 12, multiplier: 1.80 }
+        ]
+    },
+    supporter: {
+        name: '조력자',
+        stat: 'aspirationRegen',
+        statName: '열망 회복',
+        mode: 'add',
+        bonuses: [
+            { count: 4, multiplier: 5 },
+            { count: 6, multiplier: 7 },
+            { count: 8, multiplier: 9 },
+            { count: 10, multiplier: 12 },
+            { count: 12, multiplier: 15 }
+        ]
+    },
+    guardian: {
+        name: '수호자',
+        stat: 'physicalDefense',
+        statName: '물리 방어력',
+        bonuses: [
+            { count: 4, multiplier: 1.10 },
+            { count: 6, multiplier: 1.20 },
+            { count: 8, multiplier: 1.30 },
+            { count: 10, multiplier: 1.45 },
+            { count: 12, multiplier: 1.60 }
+        ]
+    },
+    purifier: {
+        name: '정화자',
+        stat: 'magicDefense',
+        statName: '마법 방어력',
+        bonuses: [
+            { count: 4, multiplier: 1.10 },
+            { count: 6, multiplier: 1.20 },
+            { count: 8, multiplier: 1.30 },
+            { count: 10, multiplier: 1.45 },
+            { count: 12, multiplier: 1.60 }
+        ]
     }
 };

@@ -199,7 +199,8 @@ class StatEngine {
             'movement', 'attackRange', 'weight', 'physicalAttack', 'magicAttack', 'rangedAttack',
             'physicalDefense', 'magicDefense', 'rangedDefense', 'criticalChance', 'criticalDamageMultiplier',
             'physicalEvadeChance', 'magicEvadeChance', 'statusEffectResistance', 'statusEffectApplication',
-            'maxBarrier', 'currentBarrier', 'totalWeight', 'turnValue', 'physicalAttackPercentage', 'magicAttackPercentage'
+            'maxBarrier', 'currentBarrier', 'totalWeight', 'turnValue', 'physicalAttackPercentage', 'magicAttackPercentage',
+            'aspirationRegen'
         ];
 
         allStatKeys.forEach(key => {

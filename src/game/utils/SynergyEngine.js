@@ -16,14 +16,18 @@ class SynergyEngine {
             const def = fateSynergies[fate];
             if (!def) return;
             const count = counts[fate] || 0;
-            let multiplier = 1;
+            let effect = def.mode === 'add' ? 0 : 1;
             def.bonuses.forEach(b => {
-                if (count >= b.count) multiplier = b.multiplier;
+                if (count >= b.count) effect = b.multiplier;
             });
             const stats = Array.isArray(def.stat) ? def.stat : [def.stat || 'hp'];
             stats.forEach(statKey => {
                 const baseValue = u.finalStats[statKey] || 0;
-                u.finalStats[statKey] = Math.round(baseValue * multiplier);
+                if (def.mode === 'add') {
+                    u.finalStats[statKey] = baseValue + effect;
+                } else {
+                    u.finalStats[statKey] = Math.round(baseValue * effect);
+                }
             });
             if (stats.includes('maxBarrier')) {
                 u.finalStats.currentBarrier = u.finalStats.maxBarrier;
@@ -55,19 +59,20 @@ class SynergyEngine {
         });
         return Object.entries(counts).map(([key, count]) => {
             const def = fateSynergies[key];
-            let multiplier = 1;
+            let effect = def?.mode === 'add' ? 0 : 1;
             if (def) {
                 def.bonuses.forEach(b => {
-                    if (count >= b.count) multiplier = b.multiplier;
+                    if (count >= b.count) effect = b.multiplier;
                 });
             }
             return {
                 key,
                 name: def?.name || key,
                 count,
-                multiplier,
+                multiplier: effect,
                 statName: def?.statName || 'HP',
-                bonuses: def?.bonuses || []
+                bonuses: def?.bonuses || [],
+                mode: def?.mode || 'multiply'
             };
         });
     }

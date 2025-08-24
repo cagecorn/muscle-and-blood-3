@@ -280,6 +280,10 @@ export class BattleSimulatorEngine {
             // ✨ [신규] 턴 시작 시 동적 패시브 효과를 적용합니다.
             if (currentUnit && currentUnit.currentHp > 0) {
                 statEngine.handleTurnStartPassives(currentUnit, this.turnQueue);
+                const regen = currentUnit.finalStats.aspirationRegen || 0;
+                if (regen > 0) {
+                    aspirationEngine.addAspiration(currentUnit.uniqueId, regen, '턴 회복');
+                }
             }
 
             // 현재 턴 표시를 위해 턴 순서 UI 업데이트
