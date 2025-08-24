@@ -12,7 +12,7 @@ class FindMeleeStrategicTargetNode extends Node {
 
     // 유닛을 공격할 수 있는 가장 가까운 위치로의 경로를 찾는 헬퍼 메서드
     async _findPathToUnit(unit, target) {
-        const attackRange = unit.finalStats.attackRange || 1;
+        const attackRange = unit.finalStats.attackRange ?? 1;
         const start = { col: unit.gridX, row: unit.gridY };
         const targetPos = { col: target.gridX, row: target.gridY };
 

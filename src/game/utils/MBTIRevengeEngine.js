@@ -29,7 +29,7 @@ class MBTIRevengeEngine {
       if (getMbtiCompatibility(allyType, defenderType) < 3) return;
 
       const distance = Math.abs(ally.gridX - attacker.gridX) + Math.abs(ally.gridY - attacker.gridY);
-      const range = ally.finalStats?.attackRange || 1;
+      const range = ally.finalStats?.attackRange ?? 1;
       const aspirationData = aspirationEngine.getAspirationData(ally.uniqueId);
       const aspiration = aspirationData?.aspiration ?? 0;
       if (distance <= range && aspiration >= 10) {

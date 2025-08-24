@@ -17,7 +17,7 @@ class FindPreferredTargetNode extends Node {
             return NodeState.FAILURE;
         }
 
-        const attackRange = unit.finalStats.attackRange || 1;
+        const attackRange = unit.finalStats.attackRange ?? 1;
         const inRange = enemyUnits.filter(e => e.currentHp > 0 &&
             Math.abs(unit.gridX - e.gridX) + Math.abs(unit.gridY - e.gridY) <= attackRange);
 

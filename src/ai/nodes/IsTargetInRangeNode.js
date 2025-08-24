@@ -10,7 +10,8 @@ class IsTargetInRangeNode extends Node {
             return NodeState.FAILURE;
         }
 
-        const attackRange = unit.finalStats.attackRange || 1;
+        // null 병합 연산자를 사용해 0도 유효한 사거리로 인식합니다.
+        const attackRange = unit.finalStats.attackRange ?? 1;
         const distance = Math.abs(unit.gridX - target.gridX) + Math.abs(unit.gridY - target.gridY);
 
         if (distance <= attackRange) {

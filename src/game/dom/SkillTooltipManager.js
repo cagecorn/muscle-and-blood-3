@@ -34,8 +34,14 @@ export class SkillTooltipManager {
             }
         }
 
-        // 사거리 텍스트: 없으면 "기본 사거리"로 표시
-        const rangeText = skillData.range !== undefined ? `사거리 ${skillData.range}` : '기본 사거리';
+        // 사거리 텍스트를 계산합니다. 글로벌/오라 스킬은 특별 표기합니다.
+        const rangeText = skillData.effect?.isGlobal
+            ? '전장 전체'
+            : skillData.effect?.isAura
+                ? `오라 (반경 ${skillData.effect.radius ?? '?'} )`
+                : skillData.range !== undefined
+                    ? `사거리 ${skillData.range}`
+                    : '기본 사거리';
 
         tooltip.innerHTML = `
             <div class="skill-illustration-large" style="background-image: url(${placeholderManager.getPath(skillData.illustrationPath)})"></div>

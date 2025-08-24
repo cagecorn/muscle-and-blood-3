@@ -40,7 +40,7 @@ class FindPathToTargetNode extends Node {
     }
 
     async _findPathToUnit(unit, target) {
-        const attackRange = unit.finalStats.attackRange || 1;
+        const attackRange = unit.finalStats.attackRange ?? 1;
         const start = { col: unit.gridX, row: unit.gridY };
         const targetPos = { col: target.gridX, row: target.gridY };
 

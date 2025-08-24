@@ -19,7 +19,7 @@ class FindEnemyAttackingAllyNode extends Node {
         let target = null;
         let minDist = Infinity;
         for (const enemy of enemies) {
-            const range = enemy.finalStats.attackRange || 1;
+            const range = enemy.finalStats.attackRange ?? 1;
             const dist = Math.abs(enemy.gridX - ally.gridX) + Math.abs(enemy.gridY - ally.gridY);
             if (dist <= range && dist < minDist) {
                 target = enemy;
