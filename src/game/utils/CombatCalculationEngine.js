@@ -156,10 +156,10 @@ class CombatCalculationEngine {
         }
         // ✨ [추가] 저격, 화염병 투척의 조건부 데미지 로직
         let bonusMultiplier = 1.0;
-        if (finalSkill.id === 'snipe' && (attacker.finalStats.attackRange || 1) >= 2) {
+        if (finalSkill.id === 'snipe' && (attacker.finalStats.attackRange ?? 1) >= 2) {
             bonusMultiplier += 0.20;
         }
-        if (finalSkill.id === 'fireBottle' && (attacker.finalStats.attackRange || 1) <= 1) {
+        if (finalSkill.id === 'fireBottle' && (attacker.finalStats.attackRange ?? 1) <= 1) {
             bonusMultiplier += 0.20;
         }
         // --- ▼ [1. '처형' 스킬 효과 로직 추가] ▼ ---

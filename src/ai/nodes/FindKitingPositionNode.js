@@ -30,7 +30,7 @@ class FindKitingPositionNode extends Node {
             this.narrationEngine.show(`${unit.instanceName}이(가) [${target.instanceName}]와(과) 거리를 벌리기 위해 이동합니다.`);
         }
 
-        const attackRange = unit.finalStats.attackRange || 3;
+        const attackRange = unit.finalStats.attackRange ?? 3;
         // ✨ 이 노드 자체의 dangerZone 하드코딩을 제거했습니다.
         // 이제 이 노드는 "안전한 공격 위치"를 찾는 데 집중하고,
         // "위험 여부" 판단은 IsTargetTooCloseNode가 전담합니다.

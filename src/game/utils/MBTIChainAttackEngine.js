@@ -29,7 +29,7 @@ class MBTIChainAttackEngine {
       if (getMbtiCompatibility(allyType, attackerType) < 3) return;
 
       const distance = Math.abs(ally.gridX - defender.gridX) + Math.abs(ally.gridY - defender.gridY);
-      const range = ally.finalStats?.attackRange || 1;
+      const range = ally.finalStats?.attackRange ?? 1;
       const aspirationData = aspirationEngine.getAspirationData(ally.uniqueId);
       const aspiration = aspirationData?.aspiration ?? 0;
       if (distance <= range && aspiration >= 10) {
