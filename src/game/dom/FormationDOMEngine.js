@@ -145,7 +145,8 @@ export class FormationDOMEngine {
         summary.forEach(s => {
             const div = document.createElement('div');
             div.className = 'active-synergy-item';
-            div.innerText = `${s.name}: ${s.statName} x${s.multiplier} (${s.count})`;
+            const symbol = s.mode === 'add' ? '+' : 'x';
+            div.innerText = `${s.name}: ${s.statName} ${symbol}${s.multiplier} (${s.count})`;
             div.addEventListener('mouseenter', e => SynergyTooltipManager.show(s.key, s.count, e));
             div.addEventListener('mouseleave', () => SynergyTooltipManager.hide());
             this.synergyContainer.appendChild(div);

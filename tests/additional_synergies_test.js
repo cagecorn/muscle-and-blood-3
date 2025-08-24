@@ -49,3 +49,38 @@ units.forEach(unit => {
 });
 console.log('Acrobat synergy test passed.');
 
+// 탐구자: 마법 공격력 증가
+reset();
+units = hireWithSynergy(12, 'seeker');
+units.forEach(unit => {
+    const base = statEngine.calculateStats(unit, unit.baseStats, unit.equippedItems).magicAttack;
+    assert.strictEqual(unit.finalStats.magicAttack, Math.round(base * 1.8));
+});
+console.log('Seeker synergy test passed.');
+
+// 조력자: 열망 회복 증가
+reset();
+units = hireWithSynergy(12, 'supporter');
+units.forEach(unit => {
+    assert.strictEqual(unit.finalStats.aspirationRegen, 15);
+});
+console.log('Supporter synergy test passed.');
+
+// 수호자: 물리 방어력 증가
+reset();
+units = hireWithSynergy(12, 'guardian');
+units.forEach(unit => {
+    const base = statEngine.calculateStats(unit, unit.baseStats, unit.equippedItems).physicalDefense;
+    assert.strictEqual(unit.finalStats.physicalDefense, Math.round(base * 1.6));
+});
+console.log('Guardian synergy test passed.');
+
+// 정화자: 마법 방어력 증가
+reset();
+units = hireWithSynergy(12, 'purifier');
+units.forEach(unit => {
+    const base = statEngine.calculateStats(unit, unit.baseStats, unit.equippedItems).magicDefense;
+    assert.strictEqual(unit.finalStats.magicDefense, Math.round(base * 1.6));
+});
+console.log('Purifier synergy test passed.');
+
