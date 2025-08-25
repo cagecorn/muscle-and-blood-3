@@ -23,7 +23,16 @@ const ally = {
   uniqueId: 2,
   team: 'ally',
   mbti: mbtiFromString('INTJ'),
-  finalStats: { hp: 100, physicalAttack: 30, physicalDefense: 0, attackRange: 1 },
+  finalStats: {
+    hp: 100,
+    physicalAttack: 10,
+    rangedAttack: 20,
+    magicAttack: 30,
+    physicalDefense: 0,
+    magicDefense: 0,
+    attackRange: 1,
+    accuracy: 1,
+  },
   currentHp: 100,
   currentBarrier: 0,
   gridX: 1,
@@ -35,7 +44,7 @@ const defender = {
   uniqueId: 3,
   team: 'enemy',
   mbti: mbtiFromString('ENTP'),
-  finalStats: { hp: 100, physicalDefense: 0 },
+  finalStats: { hp: 100, physicalDefense: 0, magicDefense: 0 },
   currentHp: 100,
   currentBarrier: 0,
   gridX: 1,
@@ -65,11 +74,14 @@ aspirationEngine.setBattleSimulator(battleSimulator);
 aspirationEngine.initializeUnits([attacker, ally, defender]);
 
 const beforeAsp = aspirationEngine.getAspirationData(ally.uniqueId).aspiration;
+const originalRandom = Math.random;
+Math.random = () => 0.99; // avoid crit/weakness
 mbtiChainAttackEngine.handleAttack(attacker, defender, { type: 'ACTIVE' });
+Math.random = originalRandom;
 const afterAsp = aspirationEngine.getAspirationData(ally.uniqueId).aspiration;
 
 assert.strictEqual(afterAsp, beforeAsp - 10, 'Aspiration should decrease by 10');
-assert(defender.currentHp < 100, 'Defender should take damage');
+assert.strictEqual(defender.currentHp, 85, 'Defender should take damage based on highest stat');
 assert(animationCalled, 'Animation should trigger');
 
 console.log('MBTI Chain Attack Engine test passed');
