@@ -23,7 +23,13 @@ class MercenaryEngine {
         this.alliedMercenaries = new Map();
         this.enemyMercenaries = new Map();
 
-        this.mercenaryNames = ['크리스', '레온', '아이온', '가레스', '로릭', '이반', '오린', '바엘', '팰크', '스팅'];
+        this.mercenaryNames = [
+            '크리스', '레온', '아이온', '가레스', '로릭',
+            '이반', '오린', '바엘', '팰크', '스팅',
+            // ✨ 추가된 이름들로 보다 다양한 용병 생성
+            '가레인', '루시안', '드레이크', '라그나', '카일',
+            '자레스', '에리오', '하운', '노바', '타이르'
+        ];
     }
 
     /**
