@@ -119,7 +119,7 @@ class CombatCalculationEngine {
         const defenderStats = applyBraveryPassive(defender, applyReinforcementLearning(defender));
 
         // ✨ [핵심 수정] 마법, 원거리, 근접 순으로 공격 타입을 명확히 구분합니다.
-        const isMagic = skill.tags?.includes(SKILL_TAGS.MAGIC);
+        const isMagic = skill.attackStatKey === 'magicAttack' || skill.tags?.includes(SKILL_TAGS.MAGIC);
         const isRanged = skill.tags?.includes(SKILL_TAGS.RANGED) && skill.tags?.includes(SKILL_TAGS.PHYSICAL);
 
         // --- [신규] 명중 판정 로직 ---
@@ -139,12 +139,10 @@ class CombatCalculationEngine {
         }
 
         // 1. 공격자의 공격력 버프/디버프 보정치를 가져옵니다.
-        const attackStatKey = isMagic ? 'magicAttack' : 'physicalAttack';
+        const attackStatKey = skill.attackStatKey || (isMagic ? 'magicAttack' : 'physicalAttack');
         const attackBuffPercent = statusEffectManager.getModifierValue(attacker, attackStatKey);
 
-        const baseAttack = isMagic
-            ? (attackerStats?.magicAttack || 0)
-            : (attackerStats?.physicalAttack || 0); // isRanged는 physicalAttack을 공유
+        const baseAttack = attackerStats?.[attackStatKey] || 0;
 
         // 2. 기본 공격력에 버프를 적용합니다.
         const buffedAttack = baseAttack * (1 + attackBuffPercent);
