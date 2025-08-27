@@ -65,6 +65,11 @@ class ItemInventoryManager {
     getInventory() {
         return [...this.inventory];
     }
+
+    /** 모든 아이템을 제거하고 초기화 */
+    reset() {
+        this.inventory = [];
+    }
 }
 
 export const itemInventoryManager = new ItemInventoryManager();

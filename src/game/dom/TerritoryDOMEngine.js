@@ -2,6 +2,11 @@ import { surveyEngine } from '../utils/SurveyEngine.js';
 import { DOMEngine } from '../utils/DOMEngine.js';
 import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { partyEngine } from '../utils/PartyEngine.js';
+import { itemInventoryManager } from '../utils/ItemInventoryManager.js';
+import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
+import { equipmentManager } from '../utils/EquipmentManager.js';
+import { uniqueIDManager } from '../utils/UniqueIDManager.js';
+import { goldManager } from '../utils/GoldManager.js';
 // ✨ [변경] PartyDOMEngine의 UnitDetailDOM을 import 합니다.
 import { UnitDetailDOM } from './UnitDetailDOM.js';
 import { mercenaryData } from '../data/mercenaries.js';
@@ -198,6 +203,14 @@ export class TerritoryDOMEngine {
         button.addEventListener('mouseout', () => this.domEngine.hideTooltip());
         button.addEventListener('click', () => {
             this.container.style.display = 'none';
+            // 기존 진행 상태 초기화
+            mercenaryEngine.reset();
+            partyEngine.reset();
+            itemInventoryManager.reset();
+            skillInventoryManager.reset();
+            equipmentManager.reset();
+            uniqueIDManager.reset();
+            goldManager.reset();
             this.scene.scene.start('WorldMapScene');
         });
         this.grid.appendChild(button);
