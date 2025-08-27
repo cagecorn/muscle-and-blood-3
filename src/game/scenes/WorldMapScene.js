@@ -37,6 +37,16 @@ export class WorldMapScene extends Scene {
             this.scene.start('TerritoryScene');
         });
 
+        // 'P' 키를 누르면 파티 편성 화면으로 이동
+        this.input.keyboard.on('keydown-P', () => {
+            this.scene.start('FormationScene');
+        });
+
+        // 'S' 키를 누르면 스킬 관리 화면으로 이동
+        this.input.keyboard.on('keydown-S', () => {
+            this.scene.start('SkillManagementScene');
+        });
+
         if (goldManager.get() === 0) {
             goldManager.set(99999);
         }

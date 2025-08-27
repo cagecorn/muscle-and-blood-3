@@ -3,6 +3,9 @@ import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { mercenaryData } from '../data/mercenaries.js';
 import { goldManager } from '../utils/GoldManager.js';
 import { createGoldPanel, updateGoldPanel } from '../dom/GoldPanel.js';
+import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
+import { skillCardDatabase } from '../data/skills/SkillCardDatabase.js';
+import { SkillCardManager } from '../dom/SkillCardManager.js';
 
 export class CityScene extends Scene {
     constructor() {
@@ -117,6 +120,8 @@ export class CityScene extends Scene {
             iconElement.onclick = () => {
                 if (iconData.name === '여관') {
                     this.showTavern();
+                } else if (iconData.name === '스킬샵') {
+                    this.showSkillShop();
                 }
             };
 
@@ -124,6 +129,79 @@ export class CityScene extends Scene {
             cell.appendChild(label);
             grid.appendChild(cell);
         });
+    }
+
+    showSkillShop() {
+        const grid = document.getElementById('city-grid');
+        grid.style.display = 'none';
+        const container = document.getElementById('city-container');
+        container.style.backgroundImage = 'url(assets/images/territory/skills-scene.png)';
+        container.style.backgroundSize = 'cover';
+
+        const shopView = document.createElement('div');
+        shopView.id = 'city-skillshop-view';
+        shopView.style.pointerEvents = 'auto';
+        container.appendChild(shopView);
+
+        const drawBtn = document.createElement('div');
+        drawBtn.className = 'tavern-button';
+        drawBtn.style.backgroundImage = `url(assets/images/territory/skills-icon.png)`;
+        drawBtn.style.marginTop = '80px';
+        drawBtn.innerText = '랜덤 5장 카드 뽑기';
+        drawBtn.style.color = 'white';
+        drawBtn.style.textAlign = 'center';
+        drawBtn.style.lineHeight = '120px';
+        shopView.appendChild(drawBtn);
+
+        const cardContainer = document.createElement('div');
+        cardContainer.id = 'skillshop-card-container';
+        Object.assign(cardContainer.style, {
+            display: 'flex',
+            gap: '10px',
+            marginTop: '20px',
+            justifyContent: 'center',
+            pointerEvents: 'auto'
+        });
+        shopView.appendChild(cardContainer);
+
+        drawBtn.onclick = () => this.drawRandomCards(cardContainer);
+
+        const back = document.createElement('div');
+        back.id = 'city-skillshop-back';
+        back.innerText = '←';
+        Object.assign(back.style, {
+            position: 'absolute',
+            top: '20px',
+            left: '20px',
+            padding: '10px 15px',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            color: 'white',
+            cursor: 'pointer',
+            borderRadius: '5px'
+        });
+        back.onclick = () => {
+            shopView.remove();
+            container.style.backgroundImage = '';
+            grid.style.display = 'grid';
+        };
+        shopView.appendChild(back);
+    }
+
+    drawRandomCards(container) {
+        container.innerHTML = '';
+        const skillIds = Object.keys(skillCardDatabase);
+        const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
+        for (let i = 0; i < 5; i++) {
+            const id = skillIds[Math.floor(Math.random() * skillIds.length)];
+            const grade = grades[Math.floor(Math.random() * grades.length)];
+            skillInventoryManager.addSkillById(id, grade);
+            const data = skillInventoryManager.getSkillData(id, grade);
+            const card = SkillCardManager.createCardElement(data);
+            card.style.opacity = '0';
+            card.style.transition = 'opacity 0.5s';
+            container.appendChild(card);
+            setTimeout(() => (card.style.opacity = '1'), i * 100);
+        }
     }
 
     showTavern() {
