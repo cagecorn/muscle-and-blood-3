@@ -194,7 +194,14 @@ class CombatCalculationEngine {
 
         const finalDefense = initialDefense * (1 + defenseReductionPercent) * (1 - armorPen);
 
-        const damageMultiplier = (finalSkill.damageMultiplier || 1.0) * bonusMultiplier;
+        // --- 기본 데미지 배율을 안전하게 계산합니다. ---
+        let baseMultiplier = finalSkill.damageMultiplier;
+        if (typeof baseMultiplier === 'object') {
+            const { min = 1, max = 1 } = baseMultiplier;
+            baseMultiplier = (min + max) / 2;
+        }
+        const damageMultiplier = (baseMultiplier ?? 1.0) * bonusMultiplier;
+
         // ✨ 2. 증폭된 공격력을 기반으로 스킬 데미지를 계산합니다.
         const skillDamage = amplifiedAttack * damageMultiplier;
 
