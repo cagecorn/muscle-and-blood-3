@@ -14,6 +14,7 @@ import { fateSynergies } from '../data/synergies.js';
 import { partyEngine } from '../utils/PartyEngine.js';
 import { synergyEngine } from '../utils/SynergyEngine.js';
 import { SynergyTooltipManager } from './SynergyTooltipManager.js';
+import { traits, applyTraits } from '../data/traits.js';
 
 /**
  * 용병 상세 정보 창의 DOM을 생성하고 관리하는 유틸리티 클래스
@@ -21,6 +22,7 @@ import { SynergyTooltipManager } from './SynergyTooltipManager.js';
 export class UnitDetailDOM {
     static create(unitData) {
         const finalStats = statEngine.calculateStats(unitData, unitData.baseStats, []);
+        applyTraits(finalStats, unitData.traits);
         // ✨ 해당 유닛의 등급 데이터를 가져옵니다.
         const grades = classGrades[unitData.id] || {};
         // ✨ 2. 현재 유닛의 숙련도 태그 목록을 가져옵니다.
@@ -30,9 +32,14 @@ export class UnitDetailDOM {
         // ✨ 1. 용병의 고유 속성 특화 정보를 가져옵니다.
         const attributeSpec = unitData.attributeSpec;
         const synergies = unitData.synergies || {};
+        const unitTraits = unitData.traits || [];
         const deployed = partyEngine.getDeployedMercenaries();
         const fateSummary = synergyEngine.getFateSynergySummary(deployed);
         const activeFateCount = synergies.fate ? (fateSummary.find(s => s.key === synergies.fate)?.count || 0) : 0;
+        const traitTags = unitTraits.map(id => {
+            const t = traits[id];
+            return t ? `<span class="trait-tag" data-tooltip="${t.description}">${t.name}</span>` : '';
+        }).join('');
 
         // --- MBTI 문자열과 툴팁 텍스트를 준비합니다. ---
         const mbti = unitData.mbti;
@@ -167,6 +174,12 @@ export class UnitDetailDOM {
                 </div>
             </div>
         `;
+        const traitSectionHTML = `
+            <div class="trait-section">
+                <div class="section-title">특성</div>
+                <div class="trait-tags-container">${traitTags}</div>
+            </div>
+        `;
         const synergySectionHTML = `
             <div class="synergy-section">
                 <div class="section-title">시너지</div>
@@ -181,6 +194,7 @@ export class UnitDetailDOM {
         // =======================================================================
         leftSection.innerHTML = `
             ${gradeDisplayHTML}
+            ${traitSectionHTML}
             ${statsContainerHTML}
             ${synergySectionHTML}
         `;
