@@ -14,6 +14,8 @@ import { CLASS_MBTI_MAP, mbtiFromString } from '../data/classMbtiMap.js';
 // ✨ [신규] 운명 시너지와 시너지 엔진을 가져옵니다.
 import { fateSynergies } from '../data/synergies.js';
 import { synergyEngine } from './SynergyEngine.js';
+// ✨ [신규] 특성 데이터를 가져옵니다.
+import { traits, applyTraits } from '../data/traits.js';
 
 /**
  * 용병의 생성, 저장, 관리를 전담하는 엔진 (싱글턴)
@@ -91,9 +93,14 @@ class MercenaryEngine {
             attribute: randomAttribute ? randomAttribute.tag : null
         };
 
+        // ✨ [신규] 용병 생성 시 두 가지 무작위 특성을 부여합니다.
+        const traitKeys = Object.keys(traits);
+        newInstance.traits = diceEngine.getRandomElement(traitKeys, 2);
+
         // ✨ 모든 클래스가 동일한 슬롯 구조를 사용하므로 추가 로직이 필요 없습니다.
 
         newInstance.finalStats = statEngine.calculateStats(newInstance, newInstance.baseStats, newInstance.equippedItems);
+        applyTraits(newInstance.finalStats, newInstance.traits);
 
         if (type === 'ally') {
             this.alliedMercenaries.set(uniqueId, newInstance);

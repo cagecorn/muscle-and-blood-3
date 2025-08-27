@@ -1,6 +1,7 @@
 import { debugLogEngine } from '../utils/DebugLogEngine.js';
 // 스킬 디버그 매니저를 import 합니다.
 import { debugSkillManager } from './DebugSkillManager.js';
+import { traits } from '../data/traits.js';
 
 /**
  * 새로 생성된 모든 유닛(아군, 적군)의 데이터를 콘솔에 기록하는 매니저
@@ -32,6 +33,17 @@ class BirthReportManager {
         debugLogEngine.log(this.name, `이름: ${unitInstance.instanceName}`);
         debugLogEngine.log(this.name, `클래스: ${unitInstance.name}`);
         debugLogEngine.log(this.name, `레벨: ${unitInstance.level}`);
+
+        if (unitInstance.traits && unitInstance.traits.length > 0) {
+            console.groupCollapsed(`%c[${this.name}] 특성`, `color: #a855f7; font-weight: bold;`);
+            unitInstance.traits.forEach(id => {
+                const t = traits[id];
+                if (t) {
+                    debugLogEngine.log(this.name, `${t.name}: ${t.description}`);
+                }
+            });
+            console.groupEnd();
+        }
 
         // 스킬 슬롯 정보를 로그로 남깁니다.
         if (unitInstance.skillSlots) {
