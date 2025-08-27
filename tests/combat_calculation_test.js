@@ -78,4 +78,10 @@ console.log('✅ 테스트 3 통과: 공격력 버프가 정상적으로 적용�
 
 statusEffectManager.activeEffects.clear(); // 테스트 후 상태 초기화
 
+// 4. 데미지 범위를 가진 스킬 처리 테스트
+const rangedSkill = { name: 'Random Strike', tags: ['물리'], damageMultiplier: { min: 0.8, max: 1.2 } };
+result = combatCalculationEngine.calculateDamage(mockWarrior, mockZombie, rangedSkill);
+assert.strictEqual(result.damage, 18, '테스트 4 실패: 범위 데미지 스킬 계산이 올바르지 않습니다.');
+console.log('✅ 테스트 4 통과: 데미지 범위를 가진 스킬도 정상 처리됩니다.');
+
 console.log('--- 모든 전투 계산 테스트 완료 ---');
