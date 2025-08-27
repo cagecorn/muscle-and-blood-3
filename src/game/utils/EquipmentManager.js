@@ -119,6 +119,12 @@ class EquipmentManager {
         const slots = this.equippedItems.get(unitId);
         return [slots.WEAPON, slots.ARMOR, slots.ACCESSORY1, slots.ACCESSORY2];
     }
+
+    /** 모든 장비 정보를 초기화 */
+    reset() {
+        this.equippedItems.clear();
+        this.itemInstanceCache.clear();
+    }
 }
 
 export const equipmentManager = new EquipmentManager();

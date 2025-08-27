@@ -197,6 +197,13 @@ class SkillInventoryManager {
     getInstanceData(instanceId) {
         return this.instanceMap.get(instanceId);
     }
+
+    /** 모든 스킬 카드 데이터를 초기화 */
+    reset() {
+        this.skillInventory = [];
+        this.instanceMap.clear();
+        this.nextInstanceId = 1;
+    }
 }
 
 export const skillInventoryManager = new SkillInventoryManager();

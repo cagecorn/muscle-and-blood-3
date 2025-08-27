@@ -117,6 +117,53 @@ class MercenaryEngine {
         return newInstance;
     }
 
+    /** 임시 용병 생성. 파티나 목록에 추가하지 않음 */
+    generateMercenary(baseMercenaryData) {
+        const randomName = this.mercenaryNames[Math.floor(Math.random() * this.mercenaryNames.length)];
+        const uniqueId = uniqueIDManager.getNextId();
+        const instance = {
+            ...baseMercenaryData,
+            uniqueId,
+            instanceName: randomName,
+            level: 1,
+            exp: 0,
+            equippedItems: [],
+            skillSlots: [null, null, null, null, null, null, null, null],
+            mbti: this._generateMBTI(baseMercenaryData.id)
+        };
+        archetypeAssignmentEngine.assignArchetype(instance);
+        const randomAttribute = diceEngine.getRandomElement(attributeSpecializations);
+        if (randomAttribute) {
+            instance.attributeSpec = randomAttribute;
+        }
+        const fateKeys = Object.keys(fateSynergies);
+        const randomFate = diceEngine.getRandomElement(fateKeys);
+        instance.synergies = {
+            fate: randomFate,
+            attribute: randomAttribute ? randomAttribute.tag : null
+        };
+        const traitKeys = Object.keys(traits);
+        instance.traits = diceEngine.getRandomElement(traitKeys, 2);
+        instance.finalStats = statEngine.calculateStats(instance, instance.baseStats, instance.equippedItems);
+        applyTraits(instance.finalStats, instance.traits);
+        return instance;
+    }
+
+    /** 생성된 용병을 실제 아군으로 등록 */
+    hireGeneratedMercenary(instance) {
+        this.alliedMercenaries.set(instance.uniqueId, instance);
+        partyEngine.addPartyMember(instance.uniqueId);
+        synergyEngine.updateAllies(Array.from(this.alliedMercenaries.values()));
+    }
+
+    /** 모든 용병 정보를 초기화 */
+    reset() {
+        this.alliedMercenaries.clear();
+        this.enemyMercenaries.clear();
+        synergyEngine.updateAllies([]);
+        synergyEngine.updateEnemies([]);
+    }
+
     getMercenaryById(uniqueId, type = 'ally') {
         return type === 'ally' ? this.alliedMercenaries.get(uniqueId) : this.enemyMercenaries.get(uniqueId);
     }

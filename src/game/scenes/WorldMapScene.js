@@ -3,6 +3,8 @@ import { WorldMapEngine } from '../utils/WorldMapEngine.js';
 import { LeaderEngine } from '../utils/LeaderEngine.js';
 import { WorldMapTurnEngine } from '../utils/WorldMapTurnEngine.js';
 import { CameraControlEngine } from '../utils/CameraControlEngine.js';
+import { goldManager } from '../utils/GoldManager.js';
+import { createGoldPanel, destroyGoldPanel } from '../dom/GoldPanel.js';
 
 export class WorldMapScene extends Scene {
     constructor() {
@@ -34,12 +36,18 @@ export class WorldMapScene extends Scene {
         this.input.keyboard.on('keydown-T', () => {
             this.scene.start('TerritoryScene');
         });
-        
+
+        if (goldManager.get() === 0) {
+            goldManager.set(99999);
+        }
+        createGoldPanel();
+
         // 씬이 종료될 때 DOM 요소를 정리하도록 이벤트를 설정합니다.
         this.events.on('shutdown', () => {
             if (territoryContainer) {
                 territoryContainer.style.display = 'block';
             }
+            destroyGoldPanel();
         });
     }
 }

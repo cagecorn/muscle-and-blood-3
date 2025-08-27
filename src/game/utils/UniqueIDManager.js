@@ -13,6 +13,10 @@ class UniqueIDManager {
     getNextId() {
         return this.nextId++;
     }
+
+    reset() {
+        this.nextId = 1;
+    }
 }
 
 export const uniqueIDManager = new UniqueIDManager();

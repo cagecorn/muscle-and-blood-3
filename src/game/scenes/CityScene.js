@@ -1,4 +1,8 @@
 import { Scene } from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
+import { mercenaryEngine } from '../utils/MercenaryEngine.js';
+import { mercenaryData } from '../data/mercenaries.js';
+import { goldManager } from '../utils/GoldManager.js';
+import { createGoldPanel, updateGoldPanel } from '../dom/GoldPanel.js';
 
 export class CityScene extends Scene {
     constructor() {
@@ -40,6 +44,9 @@ export class CityScene extends Scene {
 
         const backButton = this.createBackButton();
         cityContainer.appendChild(backButton);
+
+        createGoldPanel();
+        updateGoldPanel();
 
         this.events.on('shutdown', () => {
             const container = document.getElementById('city-container');
@@ -107,10 +114,125 @@ export class CityScene extends Scene {
                 textShadow: '1px 1px 2px black'
             });
 
+            iconElement.onclick = () => {
+                if (iconData.name === '여관') {
+                    this.showTavern();
+                }
+            };
+
             cell.appendChild(iconElement);
             cell.appendChild(label);
             grid.appendChild(cell);
         });
+    }
+
+    showTavern() {
+        const grid = document.getElementById('city-grid');
+        grid.style.display = 'none';
+        const container = document.getElementById('city-container');
+        container.style.backgroundImage = 'url(assets/images/territory/tavern-scene.png)';
+        container.style.backgroundSize = 'cover';
+
+        const tavernView = document.createElement('div');
+        tavernView.id = 'city-tavern-view';
+        tavernView.style.pointerEvents = 'auto';
+        container.appendChild(tavernView);
+
+        const back = document.createElement('div');
+        back.id = 'city-tavern-back';
+        back.innerText = '←';
+        Object.assign(back.style, {
+            position: 'absolute',
+            top: '20px',
+            left: '20px',
+            padding: '10px 15px',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            color: 'white',
+            cursor: 'pointer',
+            borderRadius: '5px'
+        });
+        back.onclick = () => {
+            tavernView.remove();
+            container.style.backgroundImage = '';
+            grid.style.display = 'grid';
+        };
+        tavernView.appendChild(back);
+
+        const hireBtn = document.createElement('div');
+        hireBtn.className = 'tavern-button';
+        hireBtn.style.backgroundImage = `url(assets/images/territory/party-icon.png)`;
+        hireBtn.style.marginTop = '80px';
+        hireBtn.innerText = '용병 고용';
+        hireBtn.style.color = 'white';
+        hireBtn.style.textAlign = 'center';
+        hireBtn.style.lineHeight = '120px';
+        hireBtn.onclick = () => this.showCandidates(tavernView);
+        tavernView.appendChild(hireBtn);
+    }
+
+    showCandidates(parent) {
+        let list = document.getElementById('mercenary-list');
+        if (list) list.remove();
+        list = document.createElement('div');
+        list.id = 'mercenary-list';
+        Object.assign(list.style, {
+            marginTop: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+            pointerEvents: 'auto'
+        });
+        parent.appendChild(list);
+
+        const mercenaryTypes = Object.values(mercenaryData);
+        for (let i = 0; i < 5; i++) {
+            const base = mercenaryTypes[Math.floor(Math.random() * mercenaryTypes.length)];
+            const candidate = mercenaryEngine.generateMercenary(base);
+            const panel = document.createElement('div');
+            Object.assign(panel.style, {
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: 'rgba(0,0,0,0.6)',
+                color: 'white',
+                padding: '10px',
+                cursor: 'pointer'
+            });
+            const portrait = document.createElement('img');
+            portrait.src = candidate.uiImage;
+            portrait.style.width = '64px';
+            portrait.style.height = '64px';
+            portrait.style.marginRight = '10px';
+            panel.appendChild(portrait);
+
+            const info = document.createElement('div');
+            const mbti = this.mbtiToString(candidate.mbti);
+            const synergies = Object.values(candidate.synergies).filter(Boolean).join(', ');
+            info.innerHTML = `
+                <div>${candidate.instanceName} (${candidate.name}) Lv.${candidate.level}</div>
+                <div>MBTI: ${mbti}</div>
+                <div>시너지: ${synergies}</div>
+                <div>특성: ${candidate.traits.join(', ')}</div>
+                <div>비용: 100</div>`;
+            panel.appendChild(info);
+
+            panel.onclick = () => {
+                if (goldManager.spend(100)) {
+                    mercenaryEngine.hireGeneratedMercenary(candidate);
+                    panel.remove();
+                    updateGoldPanel();
+                } else {
+                    alert('골드가 부족합니다.');
+                }
+            };
+
+            list.appendChild(panel);
+        }
+        updateGoldPanel();
+    }
+
+    mbtiToString(mbtiObj) {
+        const pairs = [['E','I'],['S','N'],['T','F'],['J','P']];
+        return pairs.map(([a,b]) => (mbtiObj[a] >= mbtiObj[b] ? a : b)).join('');
     }
 
     createBackButton() {

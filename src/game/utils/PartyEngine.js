@@ -71,6 +71,11 @@ class PartyEngine {
     getMercenaryById(id) {
         return mercenaryEngine.getMercenaryById(id, 'ally');
     }
+
+    /** 모든 파티 데이터를 초기화 */
+    reset() {
+        this.partyMembers = new Array(this.maxPartySize).fill(undefined);
+    }
 }
 
 export const partyEngine = new PartyEngine();
