@@ -5,12 +5,11 @@ import { skillInventoryManager } from '../../game/utils/SkillInventoryManager.js
 import { skillModifierEngine } from '../../game/utils/SkillModifierEngine.js';
 import { debugSkillExecutionManager } from '../../game/debug/DebugSkillExecutionManager.js';
 import { classProficiencies } from '../../game/data/classProficiencies.js';
-import { diceEngine } from '../../game/utils/DiceEngine.js';
 import SkillEffectProcessor from '../../game/utils/SkillEffectProcessor.js'; // 새로 만든 클래스를 import
-import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 import { SKILL_TAGS } from '../../game/utils/SkillTagManager.js';
 // ✨ YinYangEngine을 import하여 음양 지수를 조회합니다.
 import { yinYangEngine } from '../../game/utils/YinYangEngine.js';
+import { aspirationEngine } from '../../game/utils/AspirationEngine.js';
 
 class UseSkillNode extends Node {
     constructor(engines = {}) {
@@ -67,8 +66,10 @@ class UseSkillNode extends Node {
         // ✨ --- 수정 완료 --- ✨
 
 
-        // 최종 사용할 스킬 데이터를 준비합니다 (숙련도 보너스 적용)
-        const finalSkill = this._applyProficiency(unit, modifiedSkill);
+        // 최종 사용할 스킬 데이터를 준비합니다
+        const finalSkill = { ...modifiedSkill };
+        const proficiencies = classProficiencies[unit.id] || [];
+        const matchingTags = finalSkill.tags?.filter(t => proficiencies.includes(t)).length || 0;
 
         if (this.narrationEngine) {
             const targetBalance = yinYangEngine.getBalance(skillTarget.uniqueId);
@@ -107,6 +108,10 @@ class UseSkillNode extends Node {
             blackboard
         });
 
+        if (matchingTags > 0) {
+            aspirationEngine.addAspiration(unit.uniqueId, matchingTags * 2, `${finalSkill.name} 숙련도 스킬 사용`);
+        }
+
         // 처리 후 블랙보드 정리
         blackboard.set('currentSkillData', null);
         blackboard.set('currentSkillInstanceId', null);
@@ -116,32 +121,6 @@ class UseSkillNode extends Node {
 
         debugAIManager.logNodeResult(NodeState.SUCCESS);
         return NodeState.SUCCESS;
-    }
-
-    /**
-     * 숙련도에 따라 스킬의 최종 계수를 결정하여 반환합니다.
-     * @private
-     */
-    _applyProficiency(unit, skill) {
-        const finalSkill = { ...skill };
-        const proficiencies = classProficiencies[unit.id] || [];
-        const matchingTags = skill.tags.filter(t => proficiencies.includes(t)).length;
-        const rolls = Math.max(1, matchingTags);
-
-        if (typeof skill.damageMultiplier === 'object') {
-            finalSkill.damageMultiplier = diceEngine.rollWithAdvantage(
-                skill.damageMultiplier.min, skill.damageMultiplier.max, rolls
-            );
-            debugLogEngine.log('UseSkillNode', `${unit.instanceName}의 [${skill.name}] 숙련도 체크. ${rolls}번 굴림 -> 최종 계수: ${finalSkill.damageMultiplier.toFixed(2)}`);
-        }
-
-        if (typeof skill.healMultiplier === 'object') {
-            finalSkill.healMultiplier = diceEngine.rollWithAdvantage(
-                skill.healMultiplier.min, skill.healMultiplier.max, rolls
-            );
-        }
-
-        return finalSkill;
     }
 
 }
